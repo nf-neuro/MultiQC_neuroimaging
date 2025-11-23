@@ -1,5 +1,5 @@
 # This workflow was adapted from the MultiQC GitHub repository:
-name: "MultiQC lint"
+name: "Code Lint"
 on:
   push:
     branches: [main]
