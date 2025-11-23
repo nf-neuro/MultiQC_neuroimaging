@@ -35,10 +35,10 @@ jobs:
           allow-prereleases: true
 
       - name: "Install MultiQC"
-        run: pip install multiqc
+        run: pip install multiqc # We should control that version in the future.
 
       - name: "Install neuroimaging plugin"
-        run: pip install ".[dev]"
+        run: pip install -e ".[dev]"
 
       - name: "Run unit tests"
         run: pytest -vv -n ${{ env.worker_cores }} --cov=multiqc --cov-report=xml

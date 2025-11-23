@@ -51,6 +51,7 @@ Repository = "https://github.com/gagnonanthony/neuroimagingQC"
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "pytest-xdist"
 ]
 
 [project.entry-points."multiqc.modules.v1"]
