@@ -9,10 +9,11 @@ http://click.pocoo.org/5/
 
 import click
 
-# Sets config.kwargs['disable_plugin'] to True if specified (will be False otherwise)
-disable_plugin = click.option(
-    "--disable-example-plugin",
-    "disable_plugin",
+# Sets config.kwargs['single_subject'] to True if specified (will be False
+# otherwise)
+single_subject = click.option(
+    "--single-subject-report",
+    "single_subject",
     is_flag=True,
-    help="Disable the Example MultiQC plugin on this run",
+    help="Generate a single subject report (disables multi-subject modules).",
 )

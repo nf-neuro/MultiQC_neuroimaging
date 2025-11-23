@@ -1,18 +1,20 @@
 [build-system]
-requires = ["setuptools"]
+requires = [
+    "setuptools",
+    "numpy",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "multiqc_example_plugin"
-version = "0.2"
+name = "neuroimagingQC"
+version = "0.1"
 authors = [
-    {name = "Phil Ewels", email = "phil.ewels@seqera.io"},
-    {name = "Vlad Savelyev", email = "vladislav.savelyev@seqera.io"},
+    {name = "Anthony Gagnon", email = "anthony.gagnon7@usherbrooke.ca"},
 ]
-description = "Example MultiQC plugin"
+description = "A MultiQC plugin for neuroimaging quality control reports."
 readme = "README.md"
 license = {file = "LICENSE"}
-keywords = ["bioinformatics", "biology", "sequencing", "NGS", "next generation sequencing", "quality control"]
+keywords = ["neuroimaging", "dMRI", "white matter", "tractometry", "quality control"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -31,19 +33,39 @@ classifiers = [
 ]
 
 [tool.setuptools]
-packages = ["example_plugin"]
+packages = [
+    "neuroimagingQC",
+    "neuroimagingQC.modules",
+    "neuroimagingQC.modules.tractometry",
+    "neuroimagingQC.modules.cortical",
+    "neuroimagingQC.modules.subcortical",
+    "neuroimagingQC.modules.framewise_displacement",
+    "neuroimagingQC.modules.coverage",
+    "neuroimagingQC.modules.streamline_count",
+]
 
 [project.urls]
-Repository = "https://github.com/MultiQC/example-plugin"
+Repository = "https://github.com/gagnonanthony/neuroimagingQC"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
 
 [project.entry-points."multiqc.modules.v1"]
-my_example = "example_plugin.modules.my_example:MultiqcModule"
+tractometry = "neuroimagingQC.modules.tractometry:MultiqcModule"
+cortical = "neuroimagingQC.modules.cortical:MultiqcModule"
+subcortical = "neuroimagingQC.modules.subcortical:MultiqcModule"
+framewise_displacement = "neuroimagingQC.modules.framewise_displacement:MultiqcModule"
+coverage = "neuroimagingQC.modules.coverage:MultiqcModule"
+streamline_count = "neuroimagingQC.modules.streamline_count:MultiqcModule"
 
 [project.entry-points."multiqc.cli_options.v1"]
-disable_plugin = "example_plugin.cli:disable_plugin"
+single_subject = "neuroimagingQC.cli:single_subject"
 
 [project.entry-points."multiqc.hooks.v1"]
-execution_start = "example_plugin.custom_code:example_plugin_execution_start"
+execution_start = "neuroimagingQC.custom_code:neuroimagingQC_execution_start"
 
 [tool.ruff]
 line-length = 120
