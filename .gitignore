@@ -82,6 +82,7 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
+.DS_Store
 .env
 .venv
 env/
