@@ -1,6 +1,6 @@
 ![Static Badge](https://img.shields.io/badge/python-%3E3.8-blue?logo=python)
-[![Code Lint](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/lint.yml)
-[![Plugin tests](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/test.yml)
+[![Code Lint](https://github.com/nf-neuro/MultiQC_neuroimaging/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC_neuroimaging/actions/workflows/lint.yml)
+[![Plugin tests](https://github.com/nf-neuro/MultiQC_neuroimaging/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC_neuroimaging/actions/workflows/test.yml)
 
 # MultiQC-neuroimaging
 
