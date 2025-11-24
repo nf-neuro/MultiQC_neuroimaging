@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "neuroimagingQC"
+name = "neuroimaging"
 version = "0.1"
 authors = [
     {name = "Anthony Gagnon", email = "anthony.gagnon7@usherbrooke.ca"},
@@ -28,24 +28,24 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: JavaScript",
     "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Neuroimaging",
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 
 [tool.setuptools]
 packages = [
-    "neuroimagingQC",
-    "neuroimagingQC.modules",
-    "neuroimagingQC.modules.tractometry",
-    "neuroimagingQC.modules.cortical",
-    "neuroimagingQC.modules.subcortical",
-    "neuroimagingQC.modules.framewise_displacement",
-    "neuroimagingQC.modules.coverage",
-    "neuroimagingQC.modules.streamline_count",
+    "neuroimaging",
+    "neuroimaging.modules",
+    "neuroimaging.modules.tractometry",
+    "neuroimaging.modules.cortical",
+    "neuroimaging.modules.subcortical",
+    "neuroimaging.modules.framewise_displacement",
+    "neuroimaging.modules.coverage",
+    "neuroimaging.modules.streamline_count",
 ]
 
 [project.urls]
-Repository = "https://github.com/gagnonanthony/neuroimagingQC"
+Repository = "https://github.com/nf-neuro/MultiQC-neuroimaging"
 
 [project.optional-dependencies]
 dev = [
@@ -56,18 +56,18 @@ dev = [
 ]
 
 [project.entry-points."multiqc.modules.v1"]
-tractometry = "neuroimagingQC.modules.tractometry:MultiqcModule"
-cortical = "neuroimagingQC.modules.cortical:MultiqcModule"
-subcortical = "neuroimagingQC.modules.subcortical:MultiqcModule"
-framewise_displacement = "neuroimagingQC.modules.framewise_displacement:MultiqcModule"
-coverage = "neuroimagingQC.modules.coverage:MultiqcModule"
-streamline_count = "neuroimagingQC.modules.streamline_count:MultiqcModule"
+tractometry = "neuroimaging.modules.tractometry:MultiqcModule"
+cortical = "neuroimaging.modules.cortical:MultiqcModule"
+subcortical = "neuroimaging.modules.subcortical:MultiqcModule"
+framewise_displacement = "neuroimaging.modules.framewise_displacement:MultiqcModule"
+coverage = "neuroimaging.modules.coverage:MultiqcModule"
+streamline_count = "neuroimaging.modules.streamline_count:MultiqcModule"
 
 [project.entry-points."multiqc.cli_options.v1"]
-single_subject = "neuroimagingQC.cli:single_subject"
+single_subject = "neuroimaging.cli:single_subject"
 
 [project.entry-points."multiqc.hooks.v1"]
-execution_start = "neuroimagingQC.custom_code:neuroimagingQC_execution_start"
+execution_start = "neuroimaging.custom_code:neuroimaging_execution_start"
 
 [tool.ruff]
 line-length = 120

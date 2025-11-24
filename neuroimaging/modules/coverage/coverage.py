@@ -27,7 +27,7 @@ class MultiqcModule(BaseMultiqcModule):
         super(MultiqcModule, self).__init__(
             name="Coverage",
             anchor="coverage",
-            href="https://github.com/gagnonanthony/neuroimagingQC",
+            href="https://github.com/nf-neuro/MultiQC-neuroimaging",
             info="Quality control for coverage/dice coefficients",
         )
 

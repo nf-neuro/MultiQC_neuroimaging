@@ -1,5 +1,5 @@
 ---
-# MultiQC example configuration for neuroimagingQC
+# MultiQC example configuration for MultiQC-neuroimaging
 
 # Streamline Count module configuration default thresholds
 streamline_count:

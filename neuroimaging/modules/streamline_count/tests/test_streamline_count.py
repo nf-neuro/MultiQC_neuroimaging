@@ -49,14 +49,14 @@ def test_data_dir():
 
 def test_module_import():
     """Test that the streamline_count module can be imported."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     assert hasattr(streamline_count, "MultiqcModule")
 
 
 def test_parse_single_file(reset_multiqc):
     """Test parsing a single streamline count file."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     # Create a mock file object
     file_content = "8337903"
@@ -85,7 +85,7 @@ def test_iqr_calculation(reset_multiqc):
     Creates test data where one sample is a clear outlier and verifies
     the module correctly identifies it as failing.
     """
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     tmpdir = tempfile.mkdtemp()
 
@@ -140,7 +140,7 @@ def test_iqr_calculation(reset_multiqc):
 
 def test_ignore_samples_validation(reset_multiqc, test_data_dir):
     """Test that ignored samples are excluded from output."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -186,7 +186,7 @@ def test_ignore_samples_validation(reset_multiqc, test_data_dir):
 
 def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
     """Test that streamline count data is added to general statistics."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -237,7 +237,7 @@ def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
 
 def test_section_added(reset_multiqc, test_data_dir):
     """Test that a section with plot is added to the report."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -267,7 +267,7 @@ def test_section_added(reset_multiqc, test_data_dir):
 
 def test_configurable_iqr_multiplier(reset_multiqc, test_data_dir):
     """Test that custom IQR multiplier can be configured."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     # Set custom IQR multiplier to 1 (tighter bounds)
     config.streamline_count = {"iqr_multiplier": 1}
@@ -312,7 +312,7 @@ def test_single_sample_handling(reset_multiqc):
     When there's only one sample, IQR calculation cannot determine
     outliers, so the module should handle this gracefully.
     """
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     tmpdir = tempfile.mkdtemp()
 
@@ -356,7 +356,7 @@ def test_single_sample_handling(reset_multiqc):
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     tmpdir = tempfile.mkdtemp()
 
@@ -385,7 +385,7 @@ def test_empty_file_handling(reset_multiqc):
 
 def test_malformed_file_handling(reset_multiqc):
     """Test handling of malformed streamline count files."""
-    from neuroimagingQC.modules.streamline_count import streamline_count
+    from neuroimaging.modules.streamline_count import streamline_count
 
     tmpdir = tempfile.mkdtemp()
 

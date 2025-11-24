@@ -26,16 +26,16 @@ RUN \
     groupadd --gid 1000 multiqc && \
     useradd -ms /bin/bash --create-home --gid multiqc --uid 1000 multiqc
 
-# Copy the neuroimagingQC plugin source
-COPY . /tmp/neuroimagingQC/
+# Copy the neuroimaging plugin source
+COPY . /tmp/neuroimaging/
 
-# Install the neuroimagingQC plugin (regular install, not editable)
-RUN echo "Docker build log: Install neuroimagingQC plugin" 1>&2 && \
-    pip install --no-cache-dir /tmp/neuroimagingQC && \
+# Install the neuroimaging plugin (regular install, not editable)
+RUN echo "Docker build log: Install neuroimaging plugin" 1>&2 && \
+    pip install --no-cache-dir /tmp/neuroimaging && \
     echo "Docker build log: Delete python cache directories" 1>&2 && \
     find /usr/local/lib/python3.13 \( -iname '*.c' -o -iname '*.pxd' -o -iname '*.pyd' -o -iname '__pycache__' \) -exec rm -rf {} + 2>/dev/null || true && \
-    echo "Docker build log: Delete /tmp/neuroimagingQC" 1>&2 && \
-    rm -rf /tmp/neuroimagingQC
+    echo "Docker build log: Delete /tmp/neuroimaging" 1>&2 && \
+    rm -rf /tmp/neuroimaging
 
 # Set to be the new user
 USER multiqc

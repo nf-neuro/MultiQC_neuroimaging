@@ -1,6 +1,6 @@
 ![Static Badge](https://img.shields.io/badge/python-%3E3.8-blue?logo=python)
-[![Code Lint](https://github.com/gagnonanthony/neuroimagingQC/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/gagnonanthony/neuroimagingQC/actions/workflows/lint.yml)
-[![Plugin tests](https://github.com/gagnonanthony/neuroimagingQC/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/gagnonanthony/neuroimagingQC/actions/workflows/test.yml)
+[![Code Lint](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/lint.yml)
+[![Plugin tests](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nf-neuro/MultiQC-neuroimaging/actions/workflows/test.yml)
 
 # MultiQC-neuroimaging
 
@@ -23,15 +23,15 @@ All modules feature configurable thresholds, status indicators (pass/warn/fail),
 
 ```bash
 pip install multiqc
-pip install git+https://github.com/gagnonanthony/neuroimagingQC.git
+pip install git+https://github.com/nf-neuro/MultiQC-neuroimaging.git
 ```
 
 For development:
 
 ```bash
 pip install multiqc
-git clone https://github.com/gagnonanthony/neuroimagingQC.git
-cd neuroimagingQC
+git clone https://github.com/nf-neuro/MultiQC-neuroimaging.git
+cd neuroimaging
 pip install -e ".[dev]"
 pre-commit install
 ```
@@ -83,16 +83,6 @@ module_order:
   - cortical
   - subcortical
 ```
-
-## Example Report
-
-To generate a sample report with test data:
-
-```bash
-multiqc tests/test_data
-```
-
-The resulting HTML report will include interactive plots, status indicators, and general statistics for all detected modules.
 
 ## Contribute a new module
 

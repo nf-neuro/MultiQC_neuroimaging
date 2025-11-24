@@ -62,14 +62,14 @@ sub-P0838\t2000.0\t2700.0\t4300.0
 
 def test_module_import():
     """Test that the cortical module can be imported."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     assert hasattr(cortical, "MultiqcModule")
 
 
 def test_parse_single_file(reset_multiqc):
     """Test parsing a single cortical volume file."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     # Create a mock file object
     file_content = """Sample\tlh_SFG_L_6_1\tlh_SFG_L_6_2\tlh_MFG_L_7_1
@@ -108,7 +108,7 @@ sub-P1107\t1780.0\t2057.0\t3716.0"""
 
 def test_iqr_calculation(reset_multiqc):
     """Test IQR-based outlier detection."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     # Create test data with known outliers
     # Region 1: values [100, 200, 300, 400, 500] - no outliers expected
@@ -138,7 +138,7 @@ def test_iqr_calculation(reset_multiqc):
 
 def test_iqr_bounds_calculation(reset_multiqc):
     """Test that IQR bounds are correctly calculated."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     # Create test data with known distribution
     # Q1 = 200, Q3 = 400, IQR = 200
@@ -163,7 +163,7 @@ def test_iqr_bounds_calculation(reset_multiqc):
 
 def test_cortical_files(reset_multiqc, test_data_dir):
     """Test parsing cortical TSV files."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -189,7 +189,7 @@ def test_cortical_files(reset_multiqc, test_data_dir):
 
 def test_ignore_samples(reset_multiqc, test_data_dir):
     """Test ignore_samples configuration."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -226,7 +226,7 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     tmpdir = tempfile.mkdtemp()
 
@@ -256,7 +256,7 @@ def test_empty_file_handling(reset_multiqc):
 
 def test_data_written_to_file(reset_multiqc, test_data_dir):
     """Test that parsed data is written to output file."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -292,7 +292,7 @@ def test_data_written_to_file(reset_multiqc, test_data_dir):
 
 def test_hemisphere_merging(reset_multiqc, test_data_dir):
     """Test that left and right hemisphere data are merged correctly."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -332,7 +332,7 @@ def test_hemisphere_merging(reset_multiqc, test_data_dir):
 
 def test_general_stats_added(reset_multiqc, test_data_dir):
     """Test that general statistics are added to the report."""
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -368,7 +368,7 @@ def test_single_sample_handling(reset_multiqc):
     When there's only one sample, IQR calculation cannot determine
     outliers, so the module should handle this gracefully.
     """
-    from neuroimagingQC.modules.cortical import cortical
+    from neuroimaging.modules.cortical import cortical
 
     tmpdir = tempfile.mkdtemp()
 

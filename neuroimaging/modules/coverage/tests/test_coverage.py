@@ -47,14 +47,14 @@ def test_data_dir():
 
 def test_module_import():
     """Test that the coverage module can be imported."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     assert hasattr(coverage, "MultiqcModule")
 
 
 def test_parse_dice_file(reset_multiqc):
     """Test parsing a single dice coefficient file."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     # Create a mock file object with dice coefficient
     file_content = "0.8593300982298845"
@@ -79,7 +79,7 @@ def test_parse_dice_file(reset_multiqc):
 
 def test_status_assignment_pass(reset_multiqc, test_data_dir):
     """Test that PASS status is assigned correctly (dice >= 0.9)."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -107,7 +107,7 @@ def test_status_assignment_pass(reset_multiqc, test_data_dir):
 
 def test_status_assignment_warn(reset_multiqc, test_data_dir):
     """Test that WARN status is assigned correctly (0.8 <= dice < 0.9)."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -134,7 +134,7 @@ def test_status_assignment_warn(reset_multiqc, test_data_dir):
 
 def test_status_assignment_fail(reset_multiqc, test_data_dir):
     """Test that FAIL status is assigned correctly (dice < 0.8)."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -161,7 +161,7 @@ def test_status_assignment_fail(reset_multiqc, test_data_dir):
 
 def test_ignore_samples(reset_multiqc, test_data_dir):
     """Test that ignored samples are excluded from output."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -198,7 +198,7 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
 def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
     """Test that dice data is added to general statistics."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -251,7 +251,7 @@ def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
 
 def test_section_added(reset_multiqc, test_data_dir):
     """Test that a section with plot is added to the report."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -281,7 +281,7 @@ def test_section_added(reset_multiqc, test_data_dir):
 
 def test_configurable_thresholds(reset_multiqc, test_data_dir):
     """Test that custom thresholds can be configured."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     # Set custom thresholds: warn=0.85, fail=0.75
     config.coverage = {"warn_threshold": 0.85, "fail_threshold": 0.75}
@@ -320,7 +320,7 @@ def test_configurable_thresholds(reset_multiqc, test_data_dir):
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     tmpdir = tempfile.mkdtemp()
 
@@ -349,7 +349,7 @@ def test_empty_file_handling(reset_multiqc):
 
 def test_malformed_file_handling(reset_multiqc):
     """Test handling of malformed dice files."""
-    from neuroimagingQC.modules.coverage import coverage
+    from neuroimaging.modules.coverage import coverage
 
     tmpdir = tempfile.mkdtemp()
 

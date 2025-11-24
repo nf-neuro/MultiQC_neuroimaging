@@ -49,14 +49,14 @@ sub-P0190\t1002.7\t1307.1\t476.0\t680.7\t2131.9\t2259.5
 
 def test_module_import():
     """Test that the subcortical module can be imported."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     assert hasattr(subcortical, "MultiqcModule")
 
 
 def test_parse_single_file(reset_multiqc):
     """Test parsing a single subcortical volume file."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     # Create a mock file object
     file_content = """Sample\tmAmyg_L\tmAmyg_R\tlAmyg_L\tlAmyg_R\tGP_L\tGP_R
@@ -99,7 +99,7 @@ def test_iqr_calculation(reset_multiqc):
     Creates test data where one sample has a clear outlier region
     and verifies the module correctly calculates outlier percentage.
     """
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     tmpdir = tempfile.mkdtemp()
 
@@ -154,7 +154,7 @@ sub-sample5\t500.0\t5000.0
 
 def test_subcortical_files(reset_multiqc, test_data_dir):
     """Test parsing subcortical TSV files."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -175,7 +175,7 @@ def test_subcortical_files(reset_multiqc, test_data_dir):
 
 def test_ignore_samples(reset_multiqc, test_data_dir):
     """Test ignore_samples configuration."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -207,7 +207,7 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
 def test_data_written_to_file(reset_multiqc, test_data_dir):
     """Test that parsed data is written to output file."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -237,7 +237,7 @@ def test_data_written_to_file(reset_multiqc, test_data_dir):
 
 def test_section_added(reset_multiqc, test_data_dir):
     """Test that a section with plot is added to the report."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -267,7 +267,7 @@ def test_section_added(reset_multiqc, test_data_dir):
 
 def test_general_stats_added(reset_multiqc, test_data_dir):
     """Test that general statistics are added to the report."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -313,7 +313,7 @@ def test_single_sample_handling(reset_multiqc):
     When there's only one sample, IQR calculation cannot determine
     outliers, so the module should handle this gracefully.
     """
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     tmpdir = tempfile.mkdtemp()
 
@@ -368,7 +368,7 @@ sub-SINGLE\t1010.4\t1362.1\t418.4\t588.4\t1935.1\t2199.6
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     tmpdir = tempfile.mkdtemp()
 
@@ -397,7 +397,7 @@ def test_empty_file_handling(reset_multiqc):
 
 def test_malformed_file_handling(reset_multiqc):
     """Test handling of malformed subcortical files."""
-    from neuroimagingQC.modules.subcortical import subcortical
+    from neuroimaging.modules.subcortical import subcortical
 
     tmpdir = tempfile.mkdtemp()
 

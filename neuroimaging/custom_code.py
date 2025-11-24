@@ -16,7 +16,7 @@ log = logging.getLogger("multiqc")
 
 
 # Add default config options for the things that are used in MultiQC_NGI
-def neuroimagingQC_execution_start():
+def neuroimaging_execution_start():
     """Code to execute after the config files and
     command line flags have been parsedself.
 
@@ -28,10 +28,10 @@ def neuroimagingQC_execution_start():
     # name for this repository and fall back to 'unknown' if metadata
     # isn't available (e.g. when running from a source checkout).
     try:
-        version = importlib_metadata.version("neuroimagingQC")
+        version = importlib_metadata.version("neuroimaging")
     except importlib_metadata.PackageNotFoundError:
         version = "unknown"
-    log.info("Running NeuroimagingQC v{}".format(version))
+    log.info("Running MultiQC-neuroimaging v{}".format(version))
 
     # Add to the main MultiQC config object.
     # User config files have already been loaded at this point

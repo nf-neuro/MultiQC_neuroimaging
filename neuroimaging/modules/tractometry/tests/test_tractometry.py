@@ -52,14 +52,14 @@ sub-P1536\t\tvolume\t0.0\t0.0\t0.0\t0.0\t0.0\t0
 
 def test_module_import():
     """Test that the tractometry module can be imported."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     assert hasattr(tractometry, "MultiqcModule")
 
 
 def test_parse_single_file(reset_multiqc):
     """Test parsing a single tractometry file."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -112,7 +112,7 @@ def test_bundle_percentage_calculation(reset_multiqc):
     Creates test data where different samples have different numbers
     of bundles extracted to verify percentage calculation.
     """
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -170,7 +170,7 @@ sub-POOR\t\tAC\t0.00125\t0.3200\t0.00092\t0.00075\t64.500\t5
 
 def test_status_assignment_pass(reset_multiqc):
     """Test that samples with >=90% bundles get pass status."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -212,7 +212,7 @@ sub-PASS\t\tAF_R\t0.00112\t0.4091\t0.00077\t0.00059\t116.825\t340
 
 def test_status_assignment_warn(reset_multiqc):
     """Test that samples with 80-90% bundles get warn status."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -269,7 +269,7 @@ sub-FULL\t\tB9\t0.00112\t0.4091\t0.00077\t0.00059\t116.825\t340
 
 def test_status_assignment_fail(reset_multiqc):
     """Test that samples with <80% bundles get fail status."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -312,7 +312,7 @@ sub-FULL\t\tAF_R\t0.00112\t0.4091\t0.00077\t0.00059\t116.825\t340
 
 def test_ignore_samples(reset_multiqc, test_data_dir):
     """Test ignore_samples configuration."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -346,7 +346,7 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
 def test_data_written_to_file(reset_multiqc, test_data_dir):
     """Test that parsed data is written to output file."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -379,7 +379,7 @@ def test_data_written_to_file(reset_multiqc, test_data_dir):
 
 def test_sections_added(reset_multiqc, test_data_dir):
     """Test that sections with plots are added to the report."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -410,7 +410,7 @@ def test_sections_added(reset_multiqc, test_data_dir):
 
 def test_general_stats_added(reset_multiqc, test_data_dir):
     """Test that general statistics are added to the report."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -442,7 +442,7 @@ def test_general_stats_added(reset_multiqc, test_data_dir):
 
 def test_configurable_thresholds(reset_multiqc, test_data_dir):
     """Test that custom thresholds can be configured."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     # Set custom thresholds
     config.tractometry = {"warn_threshold": 95, "fail_threshold": 85}
@@ -471,7 +471,7 @@ def test_configurable_thresholds(reset_multiqc, test_data_dir):
 
 def test_single_sample_handling(reset_multiqc):
     """Test that the module handles single-sample files correctly."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 
@@ -523,7 +523,7 @@ sub-SINGLE\t\tAF_R\t0.00112\t0.4091\t0.00077\t0.00059\t116.825\t340
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.tractometry import tractometry
+    from neuroimaging.modules.tractometry import tractometry
 
     tmpdir = tempfile.mkdtemp()
 

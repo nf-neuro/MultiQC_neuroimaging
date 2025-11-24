@@ -28,7 +28,7 @@ class MultiqcModule(BaseMultiqcModule):
         super(MultiqcModule, self).__init__(
             name="Framewise Displacement",
             anchor="framewise_displacement",
-            href="https://github.com/gagnonanthony/neuroimagingQC",
+            href="https://github.com/nf-neuro/MultiQC-neuroimaging",
             info="Quality control for framewise displacement",
         )
 

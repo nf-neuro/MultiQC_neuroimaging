@@ -1,7 +1,7 @@
 """
-Tests for neuroimagingQC plugin modules.
+Tests for MultiQC-neuroimaging plugin modules.
 
-This file contains tests to verify that all neuroimagingQC modules
+This file contains tests to verify that all neuroimaging modules
 work correctly and handle edge cases properly.
 """
 
@@ -11,19 +11,19 @@ import pytest
 
 from multiqc import BaseMultiqcModule, config, report
 
-# List of all neuroimagingQC modules
+# List of all neuroimaging modules
 modules = [
-    ("tractometry", "neuroimagingQC.modules.tractometry:MultiqcModule"),
-    ("cortical", "neuroimagingQC.modules.cortical:MultiqcModule"),
-    ("subcortical", "neuroimagingQC.modules.subcortical:MultiqcModule"),
+    ("tractometry", "neuroimaging.modules.tractometry:MultiqcModule"),
+    ("cortical", "neuroimaging.modules.cortical:MultiqcModule"),
+    ("subcortical", "neuroimaging.modules.subcortical:MultiqcModule"),
     (
         "framewise_displacement",
-        "neuroimagingQC.modules.framewise_displacement:MultiqcModule",
+        "neuroimaging.modules.framewise_displacement:MultiqcModule",
     ),
-    ("coverage", "neuroimagingQC.modules.coverage:MultiqcModule"),
+    ("coverage", "neuroimaging.modules.coverage:MultiqcModule"),
     (
         "streamline_count",
-        "neuroimagingQC.modules.streamline_count:MultiqcModule",
+        "neuroimaging.modules.streamline_count:MultiqcModule",
     ),
 ]
 

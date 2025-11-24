@@ -73,14 +73,14 @@ def test_data_dir():
 
 def test_module_import():
     """Test that the framewise_displacement module can be imported."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     assert hasattr(framewise_displacement, "MultiqcModule")
 
 
 def test_ignore_samples(reset_multiqc, test_data_dir):
     """Test ignore_samples configuration."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -125,7 +125,7 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
 def test_parse_fd_file(reset_multiqc):
     """Test parsing a single FD file."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     # Create a mock file object
     file_content = """0.840188 0.0
@@ -157,7 +157,7 @@ def test_parse_fd_file(reset_multiqc):
 
 def test_status_assignment_pass(reset_multiqc, test_data_dir):
     """Test that PASS status is assigned correctly (max FD < 0.8)."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -183,7 +183,7 @@ def test_status_assignment_pass(reset_multiqc, test_data_dir):
 
 def test_status_assignment_warn(reset_multiqc, test_data_dir):
     """Test that WARN status is assigned correctly (0.8 <= max FD < 2.0)."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -209,7 +209,7 @@ def test_status_assignment_warn(reset_multiqc, test_data_dir):
 
 def test_status_assignment_fail(reset_multiqc, test_data_dir):
     """Test that FAIL status is assigned correctly (max FD >= 2.0)."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -235,7 +235,7 @@ def test_status_assignment_fail(reset_multiqc, test_data_dir):
 
 def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
     """Test that max FD data is added to general statistics."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -289,7 +289,7 @@ def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
 
 def test_multi_subject_section_added(reset_multiqc, test_data_dir):
     """Test that section with plot is added in multi-subject mode."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": False}
@@ -319,7 +319,7 @@ def test_multi_subject_section_added(reset_multiqc, test_data_dir):
 
 def test_single_subject_mode(reset_multiqc, test_data_dir):
     """Test that single-subject mode creates appropriate section."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     config.analysis_dir = [test_data_dir]
     config.kwargs = {"single_subject": True}
@@ -352,7 +352,7 @@ def test_single_subject_mode(reset_multiqc, test_data_dir):
 
 def test_configurable_thresholds(reset_multiqc, test_data_dir):
     """Test that custom thresholds can be configured."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     # Set custom thresholds: warn=1.5, fail=2.5
     config.framewise_displacement = {"warn_threshold": 1.5, "fail_threshold": 2.5}
@@ -391,7 +391,7 @@ def test_configurable_thresholds(reset_multiqc, test_data_dir):
 
 def test_empty_file_handling(reset_multiqc):
     """Test handling of empty files."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     tmpdir = tempfile.mkdtemp()
 
@@ -420,7 +420,7 @@ def test_empty_file_handling(reset_multiqc):
 
 def test_malformed_file_handling(reset_multiqc):
     """Test handling of malformed FD files."""
-    from neuroimagingQC.modules.framewise_displacement import framewise_displacement
+    from neuroimaging.modules.framewise_displacement import framewise_displacement
 
     tmpdir = tempfile.mkdtemp()
 
