@@ -3,17 +3,17 @@
 
 # Streamline Count module configuration default thresholds
 streamline_count:
-  iqr_multiplier: 5 # Default: samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
+  iqr_multiplier: 3 # Default: samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
 
 # Framewise Displacement module configuration default thresholds
 framewise_displacement:
-  warn_threshold: 2.0 # Default: samples with max FD < 0.8mm get "pass" status
-  fail_threshold: 4.0 # Default: samples with max FD >= 2.0mm get "fail" status
+  warn_threshold: 0.8 # Default: samples with max FD < 0.8mm get "pass" status
+  fail_threshold: 2.0 # Default: samples with max FD >= 2.0mm get "fail" status
 
 # Coverage module configuration default thresholds
 coverage:
   warn_threshold: 0.9 # Default: samples with dice < 0.9 get "warn" status
-  fail_threshold: 0.2 # Default: samples with dice < 0.8 get "fail" status
+  fail_threshold: 0.8 # Default: samples with dice < 0.8 get "fail" status
 
 # Cortical module configuration
 # Thresholds for outlier percentage (lower is better)

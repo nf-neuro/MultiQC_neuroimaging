@@ -57,23 +57,28 @@ The plugin will automatically detect and parse compatible files based on predefi
 Customize thresholds in your MultiQC config file and select the order of modules:
 
 ```yaml
-cortical:
+framewise_displacement:
+  warn_threshold: 0.8 # mm
+  fail_threshold: 2.0 # mm
+
+coverage:
+  warn_threshold: 0.9
+  fail_threshold: 0.8
+
+streamline_count:
   iqr_multiplier: 3
 
 tractometry:
   warn_threshold: 90
   fail_threshold: 80
 
-coverage:
-  warn_threshold: 0.9
-  fail_threshold: 0.8
+cortical:
+  warn_threshold: 20
+  fail_threshold: 10
 
-framewise_displacement:
-  warn_threshold: 0.8 # mm
-  fail_threshold: 2.0 # mm
-
-streamline_count:
-  iqr_multiplier: 3
+subcortical:
+  warn_threshold: 20
+  fail_threshold: 10
 
 module_order:
   - framewise_displacement
