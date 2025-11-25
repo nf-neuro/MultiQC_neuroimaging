@@ -31,7 +31,9 @@ class MultiqcModule(BaseMultiqcModule):
             + ". For QC purposes, they only include fractional anisotropy"
             + " (FA), volume, and streamline for the whole bundles. "
             + "Additional metrics can be found in the statistics table "
-            + "exported by the pipeline.",
+            + "exported by the pipeline. The status bars indicate flagged subjects "
+            + "based on the percentage of bundles detected, with thresholds "
+            + "configurable in the MultiQC configuration file.",
         )
 
         # Halt execution if single-subject mode is enabled

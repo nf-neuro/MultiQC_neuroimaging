@@ -29,7 +29,11 @@ class MultiqcModule(BaseMultiqcModule):
             name="Subcortical Regions",
             anchor="subcortical",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="Quality control for subcortical region segmentation",
+            info="Assessment of subcortical region volumes for quality control using IQR-based outlier detection. "
+            "Each subcortical region's volume is evaluated across subjects, and regions with volumes "
+            "falling outside the range defined by Q1 - 3*IQR to Q3 + 3*IQR are considered outliers. "
+            "The percentage of outlier regions per subject is reported in the general statistics, "
+            "with thresholds for pass/warn/fail configurable in the MultiQC configuration file.",
         )
 
         # Halt execution if single-subject mode is enabled
@@ -250,7 +254,9 @@ class MultiqcModule(BaseMultiqcModule):
     max-width: 100% !important;
 }
 </style>
-Distribution of subcortical region volumes across all samples."""
+Distribution of subcortical region volumes across all samples. You may look for extreme outliers, which
+could indicate segmentation issues or data quality problems. Combined with other indicators, these outliers
+may help identify subjects that require further investigation or exclusion."""
 
             self.add_section(
                 name="Subcortical Volume Distribution",

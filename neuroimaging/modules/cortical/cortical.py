@@ -29,7 +29,11 @@ class MultiqcModule(BaseMultiqcModule):
             name="Cortical Regions",
             anchor="cortical",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="Quality control for cortical region segmentation",
+            info="Assessment of cortical region volumes for quality control using IQR-based outlier detection."
+            " Each cortical region's volume is evaluated across subjects, and regions with volumes "
+            "falling outside the range defined by Q1 - 3*IQR to Q3 + 3*IQR are considered outliers."
+            " The percentage of outlier regions per subject is reported in the general statistics, "
+            "with thresholds for pass/warn/fail configurable in the MultiQC configuration file.",
         )
 
         # Halt execution if single-subject mode is enabled
@@ -266,7 +270,9 @@ class MultiqcModule(BaseMultiqcModule):
                 "id": "cortical_lh_volume_plot",
                 "title": "Cortical Regions: Left Hemisphere Volume Distribution",
                 "description": "Distribution of cortical region volumes in "
-                + "the left hemisphere across all samples.",
+                "the left hemisphere across all samples. You may look for extreme outliers, which "
+                "could indicate segmentation issues or data quality problems. Combined with other indicators, "
+                "these outliers may help identify subjects that require further investigation or exclusion.",
             },
             {
                 "plot_data": rh_plot_data,
@@ -276,7 +282,9 @@ class MultiqcModule(BaseMultiqcModule):
                 "id": "cortical_rh_volume_plot",
                 "title": "Cortical Regions: Right Hemisphere Volume Distribution",
                 "description": "Distribution of cortical region volumes in "
-                + "the right hemisphere across all samples.",
+                "the right hemisphere across all samples. You may look for extreme outliers, which "
+                "could indicate segmentation issues or data quality problems. Combined with other indicators, "
+                "these outliers may help identify subjects that require further investigation or exclusion.",
             },
         ]
 

@@ -30,7 +30,8 @@ class MultiqcModule(BaseMultiqcModule):
             name="Streamline Count",
             anchor="streamline_count",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="Quality control for streamline counts",
+            info="Visualization of the number of streamlines in a filtered/unfiltered tractogram"
+            " using IQR-based outlier detection for quality control.",
         )
 
         # Check if single-subject mode is enabled
@@ -173,7 +174,13 @@ class MultiqcModule(BaseMultiqcModule):
     max-width: 100% !important;
 }}
 </style>
-Streamline count quality control based on IQR outlier detection.
+Tractogram streamline count quality control with outliers detected using the IQR method.
+Using an acceptable range defined as IQR * {iqr_multiplier}, subjects with streamline counts
+falling outside this range will be flagged, and might indicate potential issues with tractography,
+tissue segmentation, or fODF reconstruction. Often times, extremely high streamline counts can be
+attributed to a lot of small streamlines generated from noisy fODF peaks. Extremely low streamline counts
+may indicate poor white matter segmentation or insufficient seeding. While this might not be sufficient to
+exclude a subject, users should investigate such outliers further to ensure data quality.
 Pass: within Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR range
 [{lower_bound:.0f} - {upper_bound:.0f}], Fail: outside range"""
 

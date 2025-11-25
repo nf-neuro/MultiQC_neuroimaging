@@ -29,7 +29,8 @@ class MultiqcModule(BaseMultiqcModule):
             name="Framewise Displacement",
             anchor="framewise_displacement",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="Quality control for framewise displacement",
+            info="Assessment of subject motion during acquisition using the framewise displacement (FD) metric "
+            "calculated by FSL's `eddy` tool for quality control.",
         )
 
         # Check if single-subject mode is enabled
@@ -163,7 +164,12 @@ class MultiqcModule(BaseMultiqcModule):
         self.add_section(
             name="Framewise Displacement",
             anchor="fd_single_subject",
-            description="Framewise displacement across volumes. Green: <0.8mm, Yellow: 0.8-2.0mm, Red: >2.0mm",
+            description="Framewise displacement across volumes. "
+            "Each point represents the FD for a volume compared to the previous volume. "
+            "High spikes in FD may indicate excessive motion during scanning. "
+            "While `eddy` attempts to correct for motion, users should be cautious "
+            "when interpreting data from subjects with high FD values. "
+            "Green: <0.8mm, Yellow: 0.8-2.0mm, Red: >2.0mm",
             plot=linegraph.plot(plot_data, plot_config),
         )
 
@@ -260,8 +266,15 @@ class MultiqcModule(BaseMultiqcModule):
         self.add_section(
             name="Framewise Displacement",
             anchor="fd_multi_subject",
-            description=f"Framewise displacement across volumes for all "
-            f"subjects. Lines are colored based on maximum FD: "
+            description="Framewise displacement (FD) across volumes for all "
+            "subjects. Each line represents a subject and its relative "
+            "movement over time. For each volume, the FD"
+            "represents the amount of movement from the previous volume. "
+            "Subjects with big spikes in FD may indicate excessive motion "
+            "during scanning. While `eddy` attempts to correct for motion, "
+            "users should be cautious when interpreting data from subjects "
+            "with high FD values. "
+            "Lines are colored based on maximum FD. "
             f"Green: <{warn_threshold}mm (pass), "
             f"Yellow: {warn_threshold}-{fail_threshold}mm (warn), "
             f"Red: >{fail_threshold}mm (fail)",

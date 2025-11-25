@@ -28,7 +28,8 @@ class MultiqcModule(BaseMultiqcModule):
             name="Coverage",
             anchor="coverage",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="Quality control for coverage/dice coefficients",
+            info="Assessment of the white matter coverage of tractograms using the DICE coefficient "
+            "between the tract density map and white matter mask for quality control.",
         )
 
         # Check if single-subject mode is enabled
@@ -170,7 +171,10 @@ class MultiqcModule(BaseMultiqcModule):
     max-width: 100% !important;
 }
 </style>
-Coverage quality control based on Dice coefficient.
+White matter coverage by the tractogram measured by computing the DICE coefficient
+between the subject's tract density map and its corresponding white matter mask.
+Higher DICE coefficients indicate better coverage of the white matter. Users should expect
+values over 0.9 for unfiltered tractograms and over 0.8 for filtered tractograms.
 Pass: >0.9, Warn: 0.8-0.9, Fail: <0.8"""
 
         self.add_section(
