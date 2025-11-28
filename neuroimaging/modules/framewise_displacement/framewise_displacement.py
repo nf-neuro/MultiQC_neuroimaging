@@ -39,8 +39,9 @@ class MultiqcModule(BaseMultiqcModule):
         # Find and parse FD files
         fd_data = {}
 
+        config_fp = config.sp.get("framewise_displacement", {}).get("fn", "")
         for f in self.find_log_files("framewise_displacement"):
-            parsed = self.parse_fd_file(f)
+            parsed = self.parse_fd_file(f, config_fp)
             if parsed:
                 sample_name = parsed["sample_name"]
                 fd_data[sample_name] = parsed["values"]
@@ -64,7 +65,7 @@ class MultiqcModule(BaseMultiqcModule):
             # Multi-subject mode: calculate max FD and create plots
             self._add_multi_subject_plots(fd_data)
 
-    def parse_fd_file(self, f) -> Dict:
+    def parse_fd_file(self, f, config_fp) -> Dict:
         """
         Parse a framewise displacement file.
 
@@ -80,12 +81,14 @@ class MultiqcModule(BaseMultiqcModule):
             return {}
 
         # Extract and clean sample name from filename
-        # The filename is like: sub-AHCYD7866_eddy_restricted_movement_rms.txt
-        # We want to extract just the subject ID: sub-AHCYD7866
+        # Using the pattern use in custom_code.py for consistency
+        # Remove the pattern suffix from filename to get the sample name.
         filename = f["fn"]
-        match = re.search(r"(sub-[A-Za-z0-9]+)", filename)
-        if match:
-            sample_name = match.group(1)
+        pattern_suffix = config_fp.lstrip("*")  # Remove leading *
+        if pattern_suffix and filename.endswith(pattern_suffix):
+            # Remove the suffix to get the sample name part (without remaining "_" if any, can have
+            # multiple underscores)
+            sample_name = re.sub(r"_+$", "", filename[: -len(pattern_suffix)])  # Remove trailing underscores
         else:
             # Fallback to default cleaned name if pattern doesn't match
             sample_name = f["s_name"]

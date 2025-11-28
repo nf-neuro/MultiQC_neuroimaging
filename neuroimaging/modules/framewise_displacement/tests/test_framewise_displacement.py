@@ -19,7 +19,7 @@ def reset_multiqc():
     if "framewise_displacement" not in config.sp:
         config.update_dict(
             config.sp,
-            {"framewise_displacement": {"fn": "*eddy_restricted_movement_rms.txt"}},
+            {"framewise_displacement": {"fn": "*dwi_eddy_restricted_movement_rms.txt"}},
         )
     yield
     config.reset()
@@ -54,15 +54,15 @@ def test_data_dir():
 """
 
     # Create files
-    pass_path = os.path.join(tmpdir, "sub-PASS001_eddy_restricted_movement_rms.txt")
+    pass_path = os.path.join(tmpdir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt")
     with open(pass_path, "w") as f:
         f.write(fd_pass)
 
-    warn_path = os.path.join(tmpdir, "sub-WARN001_eddy_restricted_movement_rms.txt")
+    warn_path = os.path.join(tmpdir, "sub-WARN001__dwi_eddy_restricted_movement_rms.txt")
     with open(warn_path, "w") as f:
         f.write(fd_warn)
 
-    fail_path = os.path.join(tmpdir, "sub-FAIL001_eddy_restricted_movement_rms.txt")
+    fail_path = os.path.join(tmpdir, "sub-FAIL001__dwi_eddy_restricted_movement_rms.txt")
     with open(fail_path, "w") as f:
         f.write(fd_fail)
 
@@ -88,19 +88,19 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-PASS001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-PASS001",
             "sp_key": "framewise_displacement",
         },
         {
-            "fn": os.path.join(test_data_dir, "sub-WARN001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-WARN001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-WARN001",
             "sp_key": "framewise_displacement",
         },
         {
-            "fn": os.path.join(test_data_dir, "sub-FAIL001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-FAIL001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-FAIL001",
             "sp_key": "framewise_displacement",
@@ -137,14 +137,14 @@ def test_parse_fd_file(reset_multiqc):
 
     f = {
         "f": file_content,
-        "fn": "sub-TEST001_eddy_restricted_movement_rms.txt",
+        "fn": "sub-TEST001_dwi_eddy_restricted_movement_rms.txt",
         "s_name": "sub-TEST001",
     }
 
     # Create a minimal module instance to access parse method
     module = object.__new__(framewise_displacement.MultiqcModule)
     module.clean_s_name = lambda x, y: x  # Mock clean_s_name method
-    result = module.parse_fd_file(f)
+    result = module.parse_fd_file(f, config_fp="*dwi_eddy_restricted_movement_rms.txt")
 
     # Check that the file was parsed correctly
     assert "sample_name" in result
@@ -164,7 +164,7 @@ def test_status_assignment_pass(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-PASS001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-PASS001",
             "sp_key": "framewise_displacement",
@@ -190,7 +190,7 @@ def test_status_assignment_warn(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-WARN001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-WARN001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-WARN001",
             "sp_key": "framewise_displacement",
@@ -216,7 +216,7 @@ def test_status_assignment_fail(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-FAIL001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-FAIL001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-FAIL001",
             "sp_key": "framewise_displacement",
@@ -242,19 +242,19 @@ def test_data_written_to_general_stats(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-PASS001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-PASS001",
             "sp_key": "framewise_displacement",
         },
         {
-            "fn": os.path.join(test_data_dir, "sub-WARN001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-WARN001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-WARN001",
             "sp_key": "framewise_displacement",
         },
         {
-            "fn": os.path.join(test_data_dir, "sub-FAIL001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-FAIL001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-FAIL001",
             "sp_key": "framewise_displacement",
@@ -296,7 +296,7 @@ def test_multi_subject_section_added(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-PASS001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-PASS001",
             "sp_key": "framewise_displacement",
@@ -326,7 +326,7 @@ def test_single_subject_mode(reset_multiqc, test_data_dir):
 
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-PASS001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-PASS001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-PASS001",
             "sp_key": "framewise_displacement",
@@ -363,13 +363,13 @@ def test_configurable_thresholds(reset_multiqc, test_data_dir):
     # sub-FAIL001 has max FD ~3.18, should be fail with threshold 2.5
     report.files["framewise_displacement"] = [
         {
-            "fn": os.path.join(test_data_dir, "sub-WARN001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-WARN001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-WARN001",
             "sp_key": "framewise_displacement",
         },
         {
-            "fn": os.path.join(test_data_dir, "sub-FAIL001_eddy_restricted_movement_rms.txt"),
+            "fn": os.path.join(test_data_dir, "sub-FAIL001__dwi_eddy_restricted_movement_rms.txt"),
             "root": test_data_dir,
             "s_name": "sub-FAIL001",
             "sp_key": "framewise_displacement",
@@ -396,7 +396,7 @@ def test_empty_file_handling(reset_multiqc):
     tmpdir = tempfile.mkdtemp()
 
     try:
-        empty_path = os.path.join(tmpdir, "sub-EMPTY_eddy_restricted_movement_rms.txt")
+        empty_path = os.path.join(tmpdir, "sub-EMPTY_dwi_eddy_restricted_movement_rms.txt")
         with open(empty_path, "w") as f:
             f.write("")
 
@@ -425,7 +425,7 @@ def test_malformed_file_handling(reset_multiqc):
     tmpdir = tempfile.mkdtemp()
 
     try:
-        bad_path = os.path.join(tmpdir, "sub-BAD_eddy_restricted_movement_rms.txt")
+        bad_path = os.path.join(tmpdir, "sub-BAD_dwi_eddy_restricted_movement_rms.txt")
         with open(bad_path, "w") as f:
             f.write("not valid data\nmore invalid stuff\n")
 
