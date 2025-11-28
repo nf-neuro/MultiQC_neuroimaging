@@ -5,6 +5,10 @@
 streamline_count:
   iqr_multiplier: 3 # Default: samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
 
+# Metricsinroi configuration default thresholds
+metricsinroi:
+  iqr_multiplier: 3 # Default: samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
+
 # Framewise Displacement module configuration default thresholds
 framewise_displacement:
   warn_threshold: 0.8 # Default: samples with max FD < 0.8mm get "pass" status
