@@ -56,7 +56,7 @@ def neuroimaging_execution_start():
     if "framewise_displacement" not in config.sp:
         config.update_dict(
             config.sp,
-            {"framewise_displacement": {"fn": "*eddy_restricted_movement_rms.txt"}},
+            {"framewise_displacement": {"fn": "*dwi_eddy_restricted_movement_rms.txt"}},
         )
 
     # Coverage search pattern: dice coefficient files
