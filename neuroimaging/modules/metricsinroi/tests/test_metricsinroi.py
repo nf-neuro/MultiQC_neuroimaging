@@ -165,21 +165,22 @@ sub-LOW\tROI2\t0.00120\t0.2500\t0.00090\t0.00070
 
 
 def test_status_assignment_pass(reset_multiqc):
-    """Test that samples within IQR range get pass status."""
+    """Test that samples within IQR range for all ROIs get pass status."""
     from neuroimaging.modules.metricsinroi import metricsinroi
 
     tmpdir = tempfile.mkdtemp()
 
     try:
-        # Create samples with similar FA values (all within normal range)
+        # Create samples with similar FA values within normal range for each ROI
+        # Different ROIs have different FA ranges to test per-ROI detection
         header = "sample\troi\tad\tfa\tmd\trd"
         test_data = f"""{header}
 sub-PASS1\tROI1\t0.00127\t0.4000\t0.00093\t0.00076
-sub-PASS1\tROI2\t0.00109\t0.4100\t0.00075\t0.00058
+sub-PASS1\tROI2\t0.00109\t0.5000\t0.00075\t0.00058
 sub-PASS2\tROI1\t0.00112\t0.4050\t0.00077\t0.00059
-sub-PASS2\tROI2\t0.00130\t0.4150\t0.00095\t0.00078
+sub-PASS2\tROI2\t0.00130\t0.5100\t0.00095\t0.00078
 sub-PASS3\tROI1\t0.00115\t0.3950\t0.00079\t0.00062
-sub-PASS3\tROI2\t0.00118\t0.4200\t0.00081\t0.00064
+sub-PASS3\tROI2\t0.00118\t0.5050\t0.00081\t0.00064
 """
 
         file_path = os.path.join(tmpdir, "rois_mean_stats.tsv")
@@ -200,7 +201,8 @@ sub-PASS3\tROI2\t0.00118\t0.4200\t0.00081\t0.00064
 
         module = metricsinroi.MultiqcModule()
 
-        # Check status in one of the sections - all should pass (within IQR)
+        # Check status in one of the sections - all should pass (within IQR for all ROIs)
+        # ROI1 has FA ~0.4, ROI2 has FA ~0.5, all samples are within range for both
         assert len(module.sections) > 0
         section = module.sections[0]
         assert '"sub-PASS1": "pass"' in section.status_bar_html
@@ -212,28 +214,29 @@ sub-PASS3\tROI2\t0.00118\t0.4200\t0.00081\t0.00064
 
 
 def test_status_assignment_fail(reset_multiqc):
-    """Test that samples outside IQR range get fail status."""
+    """Test that samples outside IQR range in ANY ROI get fail status."""
     from neuroimaging.modules.metricsinroi import metricsinroi
 
     tmpdir = tempfile.mkdtemp()
 
     try:
-        # Create samples where one has extremely different FA (outlier)
+        # Create samples where one has extremely different FA in one specific ROI (outlier)
+        # This tests that per-ROI IQR detection works - sample fails if outlier in ANY ROI
         # Need enough samples for IQR to work properly
         header = "sample\troi\tad\tfa\tmd\trd"
         test_data = f"""{header}
 sub-NORMAL1\tROI1\t0.00127\t0.4000\t0.00093\t0.00076
-sub-NORMAL1\tROI2\t0.00109\t0.4100\t0.00075\t0.00058
+sub-NORMAL1\tROI2\t0.00109\t0.5000\t0.00075\t0.00058
 sub-NORMAL2\tROI1\t0.00112\t0.4050\t0.00077\t0.00059
-sub-NORMAL2\tROI2\t0.00130\t0.4150\t0.00095\t0.00078
+sub-NORMAL2\tROI2\t0.00130\t0.5100\t0.00095\t0.00078
 sub-NORMAL3\tROI1\t0.00115\t0.4020\t0.00079\t0.00062
-sub-NORMAL3\tROI2\t0.00118\t0.4120\t0.00081\t0.00064
+sub-NORMAL3\tROI2\t0.00118\t0.5050\t0.00081\t0.00064
 sub-NORMAL4\tROI1\t0.00120\t0.4080\t0.00085\t0.00070
-sub-NORMAL4\tROI2\t0.00122\t0.4180\t0.00087\t0.00072
+sub-NORMAL4\tROI2\t0.00122\t0.5150\t0.00087\t0.00072
 sub-NORMAL5\tROI1\t0.00125\t0.4060\t0.00088\t0.00074
-sub-NORMAL5\tROI2\t0.00128\t0.4160\t0.00090\t0.00076
+sub-NORMAL5\tROI2\t0.00128\t0.5080\t0.00090\t0.00076
 sub-OUTLIER\tROI1\t0.00115\t0.1000\t0.00079\t0.00062
-sub-OUTLIER\tROI2\t0.00118\t0.1100\t0.00081\t0.00064
+sub-OUTLIER\tROI2\t0.00118\t0.5120\t0.00081\t0.00064
 """
 
         file_path = os.path.join(tmpdir, "rois_mean_stats.tsv")
@@ -254,7 +257,8 @@ sub-OUTLIER\tROI2\t0.00118\t0.1100\t0.00081\t0.00064
 
         module = metricsinroi.MultiqcModule()
 
-        # Check status - outlier should fail, normals should pass
+        # Check status - outlier should fail even though it's only an outlier in ROI1
+        # (ROI2 value is normal), normals should pass
         section = module.sections[0]
         assert '"sub-OUTLIER": "fail"' in section.status_bar_html
         assert '"sub-NORMAL1": "pass"' in section.status_bar_html

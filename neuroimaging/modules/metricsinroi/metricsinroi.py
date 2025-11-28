@@ -1,9 +1,8 @@
 """MultiQC module for metricsinroi results.
 
 This module looks for files named `rois_mean_stats.tsv` and builds:
-- Violin plot showing distribution of percentages of rois detected per
-  sample.
-- Violin plot showing FA, volume, and streamline counts per roi across
+- Violin plot showing distribution of mean FA within each roi.
+- Violin plot showing FA per roi across samples.
   samples.
 """
 
@@ -70,7 +69,7 @@ class MultiqcModule(BaseMultiqcModule):
                 roi_metrics.setdefault(roi, {})
                 roi_metrics[roi].setdefault(sample, {})
 
-                for metric in ["fa", "volume", "streamlines_count"]:
+                for metric in ["fa"]:
                     if metric in row and row[metric]:
                         try:
                             val = float(row[metric])
@@ -90,7 +89,7 @@ class MultiqcModule(BaseMultiqcModule):
 
         log.info(f"Found {len(samples_rois)} samples")
 
-        # Calculate mean FA per sample across all rois
+        # Calculate mean FA per sample across all rois for general stats
         sample_fa_values = {}
         for sample in samples_rois.keys():
             fa_values = []
@@ -100,39 +99,48 @@ class MultiqcModule(BaseMultiqcModule):
             if fa_values:
                 sample_fa_values[sample] = np.mean(fa_values)
 
-        # Create status categories based on FA IQR outlier detection
+        # Create status categories based on FA IQR outlier detection per ROI
         # User can configure IQR multiplier via config
         config_thresh = getattr(config, "metricsinroi", {})
         iqr_multiplier = config_thresh.get("iqr_multiplier", 3)
 
-        # Calculate IQR-based outliers for FA
-        if sample_fa_values:
-            values = np.array(list(sample_fa_values.values()))
-            q1 = np.percentile(values, 25)
-            q3 = np.percentile(values, 75)
-            iqr = q3 - q1
-            lower_bound = q1 - iqr_multiplier * iqr
-            upper_bound = q3 + iqr_multiplier * iqr
-
-            passed = []
-            warned = []
-            failed = []
-            for sample, fa_value in sample_fa_values.items():
-                if fa_value < lower_bound or fa_value > upper_bound:
-                    failed.append(sample)
-                else:
-                    passed.append(sample)
-        else:
-            passed = list(samples_rois.keys())
-            warned = []
-            failed = []
-            lower_bound = 0
-            upper_bound = 1
+        # Calculate IQR-based outliers for FA per ROI
+        # A sample fails if it's an outlier in ANY roi
+        passed = set(samples_rois.keys())
+        failed = set()
+        
+        roi_bounds = {}  # Store bounds for each ROI for reporting
+        
+        for roi, samples_data in roi_metrics.items():
+            # Get FA values for this ROI across all samples
+            roi_fa_values = []
+            roi_samples = []
+            for sample in samples_rois.keys():
+                if sample in samples_data and "fa" in samples_data[sample]:
+                    roi_fa_values.append(samples_data[sample]["fa"])
+                    roi_samples.append(sample)
+            
+            if len(roi_fa_values) > 0:
+                values = np.array(roi_fa_values)
+                q1 = np.percentile(values, 25)
+                q3 = np.percentile(values, 75)
+                iqr = q3 - q1
+                lower_bound = q1 - iqr_multiplier * iqr
+                upper_bound = q3 + iqr_multiplier * iqr
+                
+                roi_bounds[roi] = (lower_bound, upper_bound)
+                
+                # Check each sample for this ROI
+                for sample, fa_value in zip(roi_samples, roi_fa_values):
+                    if fa_value < lower_bound or fa_value > upper_bound:
+                        failed.add(sample)
+                        if sample in passed:
+                            passed.remove(sample)
 
         status_data = {
-            "pass": passed,
-            "warn": warned,
-            "fail": failed,
+            "pass": list(passed),
+            "warn": [],
+            "fail": list(failed),
         }
 
         # Add mean FA to general statistics table
@@ -152,8 +160,8 @@ class MultiqcModule(BaseMultiqcModule):
             },
         )
 
-        # Create violin plots for FA, volume, streamlines per roi
-        self._add_per_roi_plots(roi_metrics, status_data, iqr_multiplier, lower_bound, upper_bound)
+        # Create violin plots for FA per roi
+        self._add_per_roi_plots(roi_metrics, status_data, iqr_multiplier, roi_bounds)
 
         # Write parsed data to file
         self.write_data_file(
@@ -166,10 +174,9 @@ class MultiqcModule(BaseMultiqcModule):
         roi_metrics: Dict[str, Dict[str, Dict[str, Any]]],
         status_data: Dict[str, list],
         iqr_multiplier: float,
-        lower_bound: float,
-        upper_bound: float,
+        roi_bounds: Dict[str, tuple],
     ) -> None:
-        """Create violin plots for FA, volume, and streamlines per roi."""
+        """Create violin plots for FA per roi."""
 
         # Organize data: for each metric, create {roi: {metric_key: value}}
         # Violin plot shows distribution of metric values across samples
@@ -229,11 +236,10 @@ class MultiqcModule(BaseMultiqcModule):
     max-width: 100% !important;
 }}
 </style>
-{metric_cfg["description"]} Quality control uses IQR-based outlier detection on mean FA values across all rois.
-Using an acceptable range defined as IQR * {iqr_multiplier}, subjects with mean FA values
-falling outside this range will be flagged.
-Pass: within Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR range
-[{lower_bound:.3f} - {upper_bound:.3f}], Fail: outside range"""
+{metric_cfg["description"]} Quality control uses IQR-based outlier detection on mean FA values for each ROI independently.
+Using an acceptable range defined as IQR * {iqr_multiplier}, subjects with FA values
+falling outside this range in ANY ROI will be flagged.
+Pass: within Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR range for all ROIs, Fail: outside range in at least one ROI"""
             else:
                 description_html = f"""<style>
 .mqc-status-progress-wrapper {{
