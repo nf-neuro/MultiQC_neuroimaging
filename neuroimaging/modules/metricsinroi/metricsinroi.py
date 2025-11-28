@@ -108,9 +108,9 @@ class MultiqcModule(BaseMultiqcModule):
         # A sample fails if it's an outlier in ANY roi
         passed = set(samples_rois.keys())
         failed = set()
-        
+
         roi_bounds = {}  # Store bounds for each ROI for reporting
-        
+
         for roi, samples_data in roi_metrics.items():
             # Get FA values for this ROI across all samples
             roi_fa_values = []
@@ -119,7 +119,7 @@ class MultiqcModule(BaseMultiqcModule):
                 if sample in samples_data and "fa" in samples_data[sample]:
                     roi_fa_values.append(samples_data[sample]["fa"])
                     roi_samples.append(sample)
-            
+
             if len(roi_fa_values) > 0:
                 values = np.array(roi_fa_values)
                 q1 = np.percentile(values, 25)
@@ -127,9 +127,9 @@ class MultiqcModule(BaseMultiqcModule):
                 iqr = q3 - q1
                 lower_bound = q1 - iqr_multiplier * iqr
                 upper_bound = q3 + iqr_multiplier * iqr
-                
+
                 roi_bounds[roi] = (lower_bound, upper_bound)
-                
+
                 # Check each sample for this ROI
                 for sample, fa_value in zip(roi_samples, roi_fa_values):
                     if fa_value < lower_bound or fa_value > upper_bound:
