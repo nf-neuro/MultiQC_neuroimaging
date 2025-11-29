@@ -278,12 +278,12 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
     # Verify that the ignored sample was actually filtered out from saved data
     assert len(module.saved_raw_data) > 0
     data_dict = module.saved_raw_data["multiqc_metricsinroi"]
-    
+
     # Extract samples from the rois data structure
     samples = set()
     for roi_name, roi_data in data_dict["rois"].items():
         samples.update(roi_data.keys())
-    
+
     # Check that sub-P1688 was ignored
     assert "sub-P1688" not in samples
     assert "sub-P1536" in samples
@@ -372,7 +372,7 @@ def test_sections_with_violin_plots(reset_multiqc, test_data_dir):
 
     # Check that sections were created with violin plots
     assert len(module.sections) > 0
-    
+
     # Check that FA section exists
     section_names = [s.name for s in module.sections]
     assert "Fractional Anisotropy (FA)" in section_names
@@ -445,7 +445,7 @@ sub-SINGLE\tROI3\t0.00112\t0.4091\t0.00077\t0.00059
 
         # Check that sections were added (FA section)
         assert len(module.sections) >= 1
-        
+
         # Check that FA section exists
         section_names = [s.name for s in module.sections]
         assert "Fractional Anisotropy (FA)" in section_names
