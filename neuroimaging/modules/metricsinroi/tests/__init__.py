@@ -1,1 +1,1 @@
-"""Tests for the tractometry module."""
+"""Tests for the metricsinroi module."""

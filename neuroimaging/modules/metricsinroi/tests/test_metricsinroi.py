@@ -91,41 +91,36 @@ sub-P1688\tAF_R\t0.00112\t0.4091\t0.00077\t0.00059
 
         # Check that the module parsed the data
         assert module is not None
-        assert len(report.general_stats_data) > 0
-
-        # Check that sub-P1688 was parsed with mean FA
-        general_stats = list(report.general_stats_data.values())[0]
-        assert "sub-P1688" in general_stats
-        p1688_row = general_stats["sub-P1688"][0]
-        assert "mean_fa" in p1688_row.data
-        # Mean FA should be average of 0.3245, 0.4079, 0.4091
-        assert abs(p1688_row.data["mean_fa"] - 0.3805) < 0.01
+        # Module should have sections with plots
+        assert len(module.sections) > 0
 
     finally:
         shutil.rmtree(tmpdir)
 
 
-def test_fa_value_calculation(reset_multiqc):
-    """Test mean FA calculation across rois.
+def test_per_roi_violin_plot(reset_multiqc):
+    """Test that violin plots are created per ROI.
 
     Creates test data where different samples have different FA values
-    to verify mean FA calculation.
+    to verify per-ROI violin plot creation.
     """
     from neuroimaging.modules.metricsinroi import metricsinroi
 
     tmpdir = tempfile.mkdtemp()
 
     try:
-        # Create test data with varying FA values
+        # Create test data with varying FA values across different ROIs
         header = "sample\troi\tad\tfa\tmd\trd"
         test_data = f"""{header}
-sub-HIGH\tROI1\t0.00127\t0.6000\t0.00093\t0.00076
-sub-HIGH\tROI2\t0.00109\t0.6500\t0.00075\t0.00058
-sub-HIGH\tROI3\t0.00112\t0.7000\t0.00077\t0.00059
-sub-MED\tROI1\t0.00130\t0.4000\t0.00095\t0.00078
-sub-MED\tROI2\t0.00115\t0.4500\t0.00079\t0.00062
-sub-LOW\tROI1\t0.00125\t0.2000\t0.00092\t0.00075
-sub-LOW\tROI2\t0.00120\t0.2500\t0.00090\t0.00070
+sub-001\tROI1\t0.00127\t0.6000\t0.00093\t0.00076
+sub-001\tROI2\t0.00109\t0.5000\t0.00075\t0.00058
+sub-001\tROI3\t0.00112\t0.4000\t0.00077\t0.00059
+sub-002\tROI1\t0.00130\t0.6100\t0.00095\t0.00078
+sub-002\tROI2\t0.00115\t0.5100\t0.00079\t0.00062
+sub-002\tROI3\t0.00125\t0.4100\t0.00092\t0.00075
+sub-003\tROI1\t0.00120\t0.5900\t0.00090\t0.00070
+sub-003\tROI2\t0.00118\t0.4900\t0.00088\t0.00068
+sub-003\tROI3\t0.00122\t0.3900\t0.00089\t0.00069
 """
 
         file_path = os.path.join(tmpdir, "rois_mean_stats.tsv")
@@ -144,21 +139,12 @@ sub-LOW\tROI2\t0.00120\t0.2500\t0.00090\t0.00070
             }
         ]
 
-        metricsinroi.MultiqcModule()
+        module = metricsinroi.MultiqcModule()
 
-        # Check that general stats were added
-        assert len(report.general_stats_data) > 0
-        general_stats = list(report.general_stats_data.values())[0]
-
-        # Check mean FA values
-        high_row = general_stats["sub-HIGH"][0]
-        assert abs(high_row.data["mean_fa"] - 0.65) < 0.01  # (0.6+0.65+0.7)/3
-
-        med_row = general_stats["sub-MED"][0]
-        assert abs(med_row.data["mean_fa"] - 0.425) < 0.01  # (0.4+0.45)/2
-
-        low_row = general_stats["sub-LOW"][0]
-        assert abs(low_row.data["mean_fa"] - 0.225) < 0.01  # (0.2+0.25)/2
+        # Check that sections with violin plots were created
+        assert len(module.sections) > 0
+        # Should have FA section with violin plot containing all 3 ROIs
+        assert any(s.name == "Fractional Anisotropy (FA)" for s in module.sections)
 
     finally:
         shutil.rmtree(tmpdir)
@@ -289,14 +275,18 @@ def test_ignore_samples(reset_multiqc, test_data_dir):
     module = metricsinroi.MultiqcModule()
     assert module is not None
 
-    # Verify that the ignored sample was actually filtered out
-    assert len(report.general_stats_data) > 0
-    general_stats = list(report.general_stats_data.values())[0]
-    assert "sub-P1688" not in general_stats
-    assert "sub-P1536" in general_stats
-
-    # Verify only 1 sample remains after filtering
-    assert len(general_stats) == 1
+    # Verify that the ignored sample was actually filtered out from saved data
+    assert len(module.saved_raw_data) > 0
+    data_dict = module.saved_raw_data["multiqc_metricsinroi"]
+    
+    # Extract samples from the rois data structure
+    samples = set()
+    for roi_name, roi_data in data_dict["rois"].items():
+        samples.update(roi_data.keys())
+    
+    # Check that sub-P1688 was ignored
+    assert "sub-P1688" not in samples
+    assert "sub-P1536" in samples
 
     config.sample_names_ignore = []
 
@@ -325,13 +315,12 @@ def test_data_written_to_file(reset_multiqc, test_data_dir):
     assert module.saved_raw_data is not None
     assert len(module.saved_raw_data) > 0
 
-    # The saved_raw_data should have sample_fa_values and rois
+    # The saved_raw_data should have rois
     data_dict = module.saved_raw_data["multiqc_metricsinroi"]
-    assert "sample_fa_values" in data_dict
     assert "rois" in data_dict
 
-    # Check that both samples are in sample_fa_values
-    assert len(data_dict["sample_fa_values"]) == 2
+    # Check that ROIs contain sample data
+    assert len(data_dict["rois"]) > 0
 
 
 def test_sections_added(reset_multiqc, test_data_dir):
@@ -362,8 +351,8 @@ def test_sections_added(reset_multiqc, test_data_dir):
     assert "Fractional Anisotropy (FA)" in section_names
 
 
-def test_general_stats_added(reset_multiqc, test_data_dir):
-    """Test that general statistics are added to the report."""
+def test_sections_with_violin_plots(reset_multiqc, test_data_dir):
+    """Test that sections with violin plots are created."""
     from neuroimaging.modules.metricsinroi import metricsinroi
 
     config.analysis_dir = [test_data_dir]
@@ -379,19 +368,14 @@ def test_general_stats_added(reset_multiqc, test_data_dir):
         }
     ]
 
-    metricsinroi.MultiqcModule()
+    module = metricsinroi.MultiqcModule()
 
-    # Check that general stats data was added to the report
-    assert len(report.general_stats_data) > 0
-
-    # Check that both samples have mean_fa field
-    general_stats = list(report.general_stats_data.values())[0]
-    assert len(general_stats) == 2
-
-    for sample_name in ["sub-P1688", "sub-P1536"]:
-        assert sample_name in general_stats
-        sample_row = general_stats[sample_name][0]
-        assert "mean_fa" in sample_row.data
+    # Check that sections were created with violin plots
+    assert len(module.sections) > 0
+    
+    # Check that FA section exists
+    section_names = [s.name for s in module.sections]
+    assert "Fractional Anisotropy (FA)" in section_names
 
 
 def test_configurable_thresholds(reset_multiqc, test_data_dir):
@@ -461,15 +445,10 @@ sub-SINGLE\tROI3\t0.00112\t0.4091\t0.00077\t0.00059
 
         # Check that sections were added (FA section)
         assert len(module.sections) >= 1
-
-        # Check that general stats were added
-        assert len(report.general_stats_data) > 0
-        general_stats = list(report.general_stats_data.values())[0]
-        assert "sub-SINGLE" in general_stats
-
-        # Single sample should have mean FA
-        single_row = general_stats["sub-SINGLE"][0]
-        assert "mean_fa" in single_row.data
+        
+        # Check that FA section exists
+        section_names = [s.name for s in module.sections]
+        assert "Fractional Anisotropy (FA)" in section_names
 
     finally:
         shutil.rmtree(tmpdir)

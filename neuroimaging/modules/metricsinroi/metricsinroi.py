@@ -1,9 +1,7 @@
 """MultiQC module for metricsinroi results.
 
 This module looks for files named `rois_mean_stats.tsv` and builds:
-- Violin plot showing distribution of mean FA within each roi.
-- Violin plot showing FA per roi across samples.
-  samples.
+- Violin plot showing distribution of mean FA per roi across samples.
 """
 
 import csv
@@ -28,8 +26,8 @@ class MultiqcModule(BaseMultiqcModule):
             name="metricsinroi",
             anchor="metricsinroi",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
-            info="This section contains QC metrics from metricsinroi analysis"
-            + ". For QC purposes, they only include fractional anisotropy"
+            info="This section contains QC metrics from metrics in region-of-interests analysis"
+            + ". For QC purposes, it only includes fractional anisotropy"
             + " (FA). "
             + "Additional metrics can be found in the statistics table "
             + "exported by the pipeline. Subjects are flagged using "
@@ -87,17 +85,13 @@ class MultiqcModule(BaseMultiqcModule):
         if len(samples_rois) == 0:
             raise ModuleNoSamplesFound
 
-        log.info(f"Found {len(samples_rois)} samples")
+        # Also remove ignored samples from roi_metrics
+        for roi in roi_metrics:
+            for sample in list(roi_metrics[roi].keys()):
+                if sample not in samples_rois:
+                    del roi_metrics[roi][sample]
 
-        # Calculate mean FA per sample across all rois for general stats
-        sample_fa_values = {}
-        for sample in samples_rois.keys():
-            fa_values = []
-            for roi, samples_data in roi_metrics.items():
-                if sample in samples_data and "fa" in samples_data[sample]:
-                    fa_values.append(samples_data[sample]["fa"])
-            if fa_values:
-                sample_fa_values[sample] = np.mean(fa_values)
+        log.info(f"Found {len(samples_rois)} samples")
 
         # Create status categories based on FA IQR outlier detection per ROI
         # User can configure IQR multiplier via config
@@ -143,29 +137,12 @@ class MultiqcModule(BaseMultiqcModule):
             "fail": list(failed),
         }
 
-        # Add mean FA to general statistics table
-        general_stats_data = {s: {"mean_fa": fa_val} for s, fa_val in sample_fa_values.items()}
-
-        self.general_stats_addcols(
-            general_stats_data,
-            {
-                "mean_fa": {
-                    "title": "Mean FA",
-                    "description": "Mean fractional anisotropy across all rois",
-                    "max": 1,
-                    "min": 0,
-                    "scale": "RdYlGn",
-                    "format": "{:,.3f}",
-                }
-            },
-        )
-
         # Create violin plots for FA per roi
         self._add_per_roi_plots(roi_metrics, status_data, iqr_multiplier, roi_bounds)
 
         # Write parsed data to file
         self.write_data_file(
-            {"sample_fa_values": sample_fa_values, "rois": roi_metrics},
+            {"rois": roi_metrics},
             "multiqc_metricsinroi",
         )
 
@@ -240,22 +217,6 @@ class MultiqcModule(BaseMultiqcModule):
 Using an acceptable range defined as IQR * {iqr_multiplier}, subjects with FA values
 falling outside this range in ANY ROI will be flagged.
 Pass: within Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR range for all ROIs, Fail: outside range in at least one ROI"""
-            else:
-                description_html = f"""<style>
-.mqc-status-progress-wrapper {{
-    width: 100% !important;
-    max-width: 100% !important;
-}}
-.progress-stacked.mqc-status-progress {{
-    width: 100% !important;
-    max-width: 100% !important;
-}}
-.progress-stacked.mqc-status-progress .progress {{
-    width: 100% !important;
-    max-width: 100% !important;
-}}
-</style>
-{metric_cfg["description"]}"""
 
             # Create single violin plot with all rois as columns
             self.add_section(
