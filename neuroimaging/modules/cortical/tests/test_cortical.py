@@ -123,7 +123,7 @@ def test_iqr_calculation(reset_multiqc):
 
     # Create a minimal module instance just to access the method
     module = object.__new__(cortical.MultiqcModule)
-    percentages = module._calculate_outlier_percentages(cortical_data)
+    percentages = module._calculate_outlier_percentages(cortical_data, 3)
 
     # Check that sample5 is identified as having outliers
     # It should have 50% outliers (1 out of 2 regions)
@@ -154,7 +154,7 @@ def test_iqr_bounds_calculation(reset_multiqc):
 
     # Create a minimal module instance just to access the method
     module = object.__new__(cortical.MultiqcModule)
-    percentages = module._calculate_outlier_percentages(cortical_data)
+    percentages = module._calculate_outlier_percentages(cortical_data, 3)
 
     # All values should be within bounds
     for sample, pct in percentages.items():
