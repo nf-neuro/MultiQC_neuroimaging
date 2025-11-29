@@ -70,7 +70,7 @@ def test_parse_single_file(reset_multiqc):
     # Create a minimal module instance to access parse method
     module = object.__new__(streamline_count.MultiqcModule)
     module.clean_s_name = lambda x, y: x  # Mock clean_s_name method
-    result = module.parse_sc_file(f)
+    result = module.parse_sc_file(f, "*__sc.txt")
 
     # Check that the file was parsed correctly
     assert "sample_name" in result

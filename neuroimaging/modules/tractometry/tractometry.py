@@ -28,12 +28,12 @@ class MultiqcModule(BaseMultiqcModule):
             anchor="tractometry",
             href="https://github.com/scilus/nf-pediatric",
             info="This section contains QC metrics from tractometry analysis"
-            + ". For QC purposes, they only include fractional anisotropy"
-            + " (FA), volume, and streamline for the whole bundles. "
-            + "Additional metrics can be found in the statistics table "
-            + "exported by the pipeline. The status bars indicate flagged subjects "
-            + "based on the percentage of bundles detected, with thresholds "
-            + "configurable in the MultiQC configuration file.",
+            ". For QC purposes, they only include fractional anisotropy"
+            " (FA), volume, and streamline for the whole bundles. "
+            "Additional metrics can be found in the statistics table "
+            "exported by the pipeline. The status bars indicate flagged subjects "
+            "based on the percentage of bundles detected, with thresholds "
+            "configurable in the MultiQC configuration file.",
         )
 
         # Halt execution if single-subject mode is enabled
@@ -43,7 +43,7 @@ class MultiqcModule(BaseMultiqcModule):
         # Find files using the custom search pattern added in custom_code
         files = list(self.find_log_files("tractometry"))
 
-        # Nothing found - raise ModuleNoSamplesFound to tell MultiQC
+        # Nothing found - raise ModuleNoSamplesFound to tell MultiQC nothing to do here
         if len(files) == 0:
             log.debug(f"Could not find tractometry reports in {config.analysis_dir}")
             raise ModuleNoSamplesFound

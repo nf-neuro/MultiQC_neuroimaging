@@ -31,7 +31,7 @@ class MultiqcModule(BaseMultiqcModule):
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
             info="Assessment of cortical region volumes for quality control using IQR-based outlier detection."
             " Each cortical region's volume is evaluated across subjects, and regions with volumes "
-            "falling outside the range defined by Q1 - 3*IQR to Q3 + 3*IQR are considered outliers."
+            "falling outside the range are considered outliers."
             " The percentage of outlier regions per subject is reported in the general statistics, "
             "with thresholds for pass/warn/fail configurable in the MultiQC configuration file.",
         )
@@ -44,6 +44,7 @@ class MultiqcModule(BaseMultiqcModule):
         self.cortical_config = getattr(config, "cortical", {})
         warn_threshold = self.cortical_config.get("warn_threshold", 20)
         fail_threshold = self.cortical_config.get("fail_threshold", 10)
+        iqr_multiplier = self.cortical_config.get("iqr_multiplier", 3)
 
         # Find and parse cortical volume files
         cortical_data = {}
@@ -71,7 +72,7 @@ class MultiqcModule(BaseMultiqcModule):
         log.info(f"Found {len(cortical_data)} samples")
 
         # Calculate outlier percentages for each sample
-        sample_percentages = self._calculate_outlier_percentages(cortical_data)
+        sample_percentages = self._calculate_outlier_percentages(cortical_data, iqr_multiplier)
 
         # Create status bar data
         # Note: Lower outlier percentage is better
@@ -106,7 +107,7 @@ class MultiqcModule(BaseMultiqcModule):
         )
 
         # Add violin plots for volume distributions
-        self._add_per_region_plots(cortical_data, status_data)
+        self._add_per_region_plots(cortical_data, status_data, iqr_multiplier)
 
         # Write parsed data to file
         self.write_data_file(cortical_data, "multiqc_cortical_data")
@@ -155,7 +156,7 @@ class MultiqcModule(BaseMultiqcModule):
 
         return data
 
-    def _calculate_outlier_percentages(self, cortical_data: Dict) -> Dict[str, float]:
+    def _calculate_outlier_percentages(self, cortical_data: Dict, iqr_multiplier: float) -> Dict[str, float]:
         """
         Calculate the percentage of outlier regions per sample.
 
@@ -194,8 +195,8 @@ class MultiqcModule(BaseMultiqcModule):
             iqr = q3 - q1
 
             # Define outlier bounds: Q1 - 3*IQR and Q3 + 3*IQR
-            lower_bound = q1 - 3 * iqr
-            upper_bound = q3 + 3 * iqr
+            lower_bound = q1 - iqr_multiplier * iqr
+            upper_bound = q3 + iqr_multiplier * iqr
 
             region_iqr_bounds[region_name] = (lower_bound, upper_bound)
 
@@ -222,6 +223,7 @@ class MultiqcModule(BaseMultiqcModule):
         self,
         cortical_data: Dict,
         status_data: Dict,
+        iqr_multiplier: float,
     ) -> None:
         """
         Add violin plots showing volume distribution per region.
@@ -271,7 +273,11 @@ class MultiqcModule(BaseMultiqcModule):
                 "title": "Cortical Regions: Left Hemisphere Volume Distribution",
                 "description": "Distribution of cortical region volumes in "
                 "the left hemisphere across all samples. You may look for extreme outliers, which "
-                "could indicate segmentation issues or data quality problems. Combined with other indicators, "
+                "could indicate segmentation issues or data quality problems. Automatic detection "
+                "of these outliers is based on the interquartile range (IQR) method, where values "
+                f"falling outside the range defined by Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR"
+                " are considered outliers. "
+                "Combined with other indicators, "
                 "these outliers may help identify subjects that require further investigation or exclusion.",
             },
             {
@@ -283,7 +289,11 @@ class MultiqcModule(BaseMultiqcModule):
                 "title": "Cortical Regions: Right Hemisphere Volume Distribution",
                 "description": "Distribution of cortical region volumes in "
                 "the right hemisphere across all samples. You may look for extreme outliers, which "
-                "could indicate segmentation issues or data quality problems. Combined with other indicators, "
+                "could indicate segmentation issues or data quality problems. Automatic detection "
+                "of these outliers is based on the interquartile range (IQR) method, where values "
+                f"falling outside the range defined by Q1 - {iqr_multiplier}*IQR to Q3 + {iqr_multiplier}*IQR"
+                " are considered outliers. "
+                "Combined with other indicators, "
                 "these outliers may help identify subjects that require further investigation or exclusion.",
             },
         ]

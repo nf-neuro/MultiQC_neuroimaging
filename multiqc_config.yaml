@@ -24,12 +24,14 @@ coverage:
 cortical:
   warn_threshold: 20 # Warn if outlier % > 20%
   fail_threshold: 10 # Pass if outlier % <= 10%
+  iqr_multiplier: 3 # Samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
 
 # Subcortical module configuration
 # Thresholds for outlier percentage (lower is better)
 subcortical:
   warn_threshold: 20 # Warn if outlier % > 20%
   fail_threshold: 10 # Pass if outlier % <= 10%
+  iqr_multiplier: 3 # Samples outside Q1 - 3*IQR to Q3 + 3*IQR are marked as fail
 
 # Tractometry module configuration
 tractometry:
@@ -42,5 +44,23 @@ module_order:
   - coverage
   - streamline_count
   - tractometry
+  - metricsinroi
   - cortical
   - subcortical
+
+# File patterns to match for each module (defaults can be overridden here)
+sp:
+  framewise_displacement:
+    fn: "*dwi_eddy_restricted_movement_rms.txt"
+  coverage:
+    fn: "*coverage_metrics.tsv"
+  streamline_count:
+    fn: "*streamline_count.tsv"
+  tractometry:
+    fn: "*bundles_mean_stats.tsv"
+  cortical/volume:
+    fn: "cortical_*_volume_*.tsv"
+  subcortical/volume:
+    fn: "subcortical_*_volume_*.tsv"
+  metricsinroi:
+    fn: "rois_mean_stats.tsv"

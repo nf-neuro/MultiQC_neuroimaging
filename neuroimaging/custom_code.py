@@ -18,7 +18,7 @@ log = logging.getLogger("multiqc")
 # Add default config options for the things that are used in MultiQC_NGI
 def neuroimaging_execution_start():
     """Code to execute after the config files and
-    command line flags have been parsedself.
+    command line flags have been parsed.
 
     This setuptools hook is the earliest that will be able
     to use custom command line flags.
@@ -39,12 +39,10 @@ def neuroimaging_execution_start():
     #   clobbering values that have been customised by users.
 
     # Tractometry search pattern: bundles mean stats TSV
-    # This tells MultiQC to look for files named `bundles_mean_stats.tsv`
     if "tractometry" not in config.sp:
-        config.update_dict(config.sp, {"tractometry": {"fn": "bundles_mean_stats.tsv"}})
+        config.update_dict(config.sp, {"tractometry": {"fn": "*bundles_mean_stats.tsv"}})
 
     # Cortical regions search pattern: cortical volume TSV files
-    # This tells MultiQC to look for files matching the pattern
     if "cortical/volume" not in config.sp:
         config.update_dict(config.sp, {"cortical/volume": {"fn": "cortical_*_volume_*.tsv"}})
 

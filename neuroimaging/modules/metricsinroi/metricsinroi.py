@@ -23,7 +23,7 @@ class MultiqcModule(BaseMultiqcModule):
 
     def __init__(self):
         super(MultiqcModule, self).__init__(
-            name="metricsinroi",
+            name="Metrics in region of interest",
             anchor="metricsinroi",
             href="https://github.com/nf-neuro/MultiQC_neuroimaging",
             info="This section contains QC metrics from metrics in region-of-interests analysis"

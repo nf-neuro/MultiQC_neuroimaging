@@ -54,6 +54,10 @@ The plugin will automatically detect and parse compatible files based on predefi
 
 ### Configuration
 
+> [!NOTE]
+>
+> A complete multiqc config file example is available at the root of this project, see `multiqc_config.yaml`.
+
 Customize thresholds in your MultiQC config file and select the order of modules:
 
 ```yaml
@@ -75,10 +79,12 @@ tractometry:
 cortical:
   warn_threshold: 20
   fail_threshold: 10
+  iqr_multiplier: 3
 
 subcortical:
   warn_threshold: 20
   fail_threshold: 10
+  iqr_multiplier: 3
 
 module_order:
   - framewise_displacement
@@ -87,6 +93,23 @@ module_order:
   - tractometry
   - cortical
   - subcortical
+
+# File patterns to match for each module (defaults can be overridden here)
+sp:
+  framewise_displacement:
+    fn: "*dwi_eddy_restricted_movement_rms.txt"
+  coverage:
+    fn: "*coverage_metrics.tsv"
+  streamline_count:
+    fn: "*streamline_count.tsv"
+  tractometry:
+    fn: "*bundles_mean_stats.tsv"
+  cortical/volume:
+    fn: "cortical_*_volume_*.tsv"
+  subcortical/volume:
+    fn: "subcortical_*_volume_*.tsv"
+  metricsinroi:
+    fn: "rois_mean_stats.tsv"
 ```
 
 ## Contribute a new module

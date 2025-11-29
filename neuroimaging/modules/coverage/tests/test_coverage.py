@@ -68,7 +68,7 @@ def test_parse_dice_file(reset_multiqc):
     # Create a minimal module instance to access parse method
     module = object.__new__(coverage.MultiqcModule)
     module.clean_s_name = lambda x, y: x  # Mock clean_s_name method
-    result = module.parse_dice_file(f)
+    result = module.parse_dice_file(f, "*__dice.txt")
 
     # Check that the file was parsed correctly
     assert "sample_name" in result
