@@ -44,8 +44,9 @@ class MultiqcModule(BaseMultiqcModule):
         # Find and parse streamline count files
         sc_data = {}
 
+        config_fp = config.sp.get("streamline_count", {}).get("fn", "")
         for f in self.find_log_files("streamline_count"):
-            parsed = self.parse_sc_file(f)
+            parsed = self.parse_sc_file(f, config_fp)
             if parsed:
                 sample_name = parsed["sample_name"]
                 sc_data[sample_name] = parsed["sc_value"]
@@ -65,7 +66,7 @@ class MultiqcModule(BaseMultiqcModule):
         # Add streamline count statistics and plots
         self._add_streamline_count_stats(sc_data)
 
-    def parse_sc_file(self, f) -> Dict:
+    def parse_sc_file(self, f, config_fp) -> Dict:
         """
         Parse a streamline count file.
 
@@ -78,12 +79,13 @@ class MultiqcModule(BaseMultiqcModule):
             return {}
 
         # Extract and clean sample name from filename
-        # The filename is like: sub-1019__sc.txt
-        # We want to extract just the subject ID: sub-1019
+        # Using the pattern use in custom_code.py for consistency
+        # Remove the pattern suffix from filename to get the sample name.
         filename = f["fn"]
-        match = re.search(r"(sub-[A-Za-z0-9]+)", filename)
-        if match:
-            sample_name = match.group(1)
+        pattern_suffix = config_fp.lstrip("*")
+        if pattern_suffix and filename.endswith(pattern_suffix):
+            # Remove the suffix and any trailing underscores.
+            sample_name = re.sub(r"_+$", "", filename[: -len(pattern_suffix)])
         else:
             # Fallback to default cleaned name if pattern doesn't match
             sample_name = f["s_name"]
