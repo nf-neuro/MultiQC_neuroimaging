@@ -135,6 +135,11 @@ class MultiqcModule(BaseMultiqcModule):
         # Create plot data: {sample: {x: y}}
         plot_data = {sample_name: {i: value for i, value in enumerate(values)}}
 
+        # Fetch from config thresholds
+        config_thresh = getattr(config, "framewise_displacement", {})
+        warn_threshold = config_thresh.get("warn_threshold", 0.8)
+        fail_threshold = config_thresh.get("fail_threshold", 2.0)
+
         # Add colored regions
         plot_config = {
             "id": "fd_single_subject_plot",
@@ -142,22 +147,22 @@ class MultiqcModule(BaseMultiqcModule):
             "ylab": "FD (mm)",
             "xlab": "Volume",
             "y_bands": [
-                {"from": 0, "to": 0.8, "color": "#C5FFC5"},
-                {"from": 0.8, "to": 2.0, "color": "#FFFF99"},
-                {"from": 2.0, "to": 10, "color": "#FFB6C6"},
+                {"from": 0, "to": warn_threshold, "color": "#C5FFC5"},
+                {"from": warn_threshold, "to": fail_threshold, "color": "#FFFF99"},
+                {"from": fail_threshold, "to": 10, "color": "#FFB6C6"},
             ],
             "y_lines": [
                 {
-                    "value": 0.8,
+                    "value": warn_threshold,
                     "color": "#95a5a6",
                     "dash": "dash",
-                    "label": "Threshold: 0.8 mm",
+                    "label": f"Threshold: {warn_threshold} mm",
                 },
                 {
-                    "value": 2.0,
+                    "value": fail_threshold,
                     "color": "#95a5a6",
                     "dash": "dash",
-                    "label": "Threshold: 2.0 mm",
+                    "label": f"Threshold: {fail_threshold} mm",
                 },
             ],
             "colors": {sample_name: "#000000"},
@@ -172,7 +177,7 @@ class MultiqcModule(BaseMultiqcModule):
             "High spikes in FD may indicate excessive motion during scanning. "
             "While `eddy` attempts to correct for motion, users should be cautious "
             "when interpreting data from subjects with high FD values. "
-            "Green: <0.8mm, Yellow: 0.8-2.0mm, Red: >2.0mm",
+            f"Green: <{warn_threshold}mm, Yellow: {warn_threshold}-{fail_threshold}mm, Red: >{fail_threshold}mm",
             plot=linegraph.plot(plot_data, plot_config),
         )
 
