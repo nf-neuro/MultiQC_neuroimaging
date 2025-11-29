@@ -66,3 +66,7 @@ def neuroimaging_execution_start():
     # Streamline count search pattern
     if "streamline_count" not in config.sp:
         config.update_dict(config.sp, {"streamline_count": {"fn": "*__sc.txt"}})
+
+    # Metricsinroi search pattern
+    if "metricsinroi" not in config.sp:
+        config.update_dict(config.sp, {"metricsinroi": {"fn": "rois_mean_stats.tsv"}})
