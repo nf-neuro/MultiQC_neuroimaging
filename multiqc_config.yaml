@@ -44,3 +44,18 @@ module_order:
   - tractometry
   - cortical
   - subcortical
+
+# File patterns to match for each module
+sp:
+  framewise_displacement:
+    fn: "*dwi_eddy_restricted_movement_rms.txt"
+  coverage:
+    fn: "*coverage_metrics.tsv"
+  streamline_count:
+    fn: "*streamline_count.tsv"
+  tractometry:
+    fn: "*bundles_mean_stats.tsv"
+  cortical/volume:
+    fn: "cortical_*_volume_*.tsv"
+  subcortical/volume:
+    fn: "subcortical_*_volume_*.tsv"
