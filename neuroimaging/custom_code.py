@@ -39,7 +39,6 @@ def neuroimaging_execution_start():
     #   clobbering values that have been customised by users.
 
     # Tractometry search pattern: bundles mean stats TSV
-    # log.info("config.sp contents before adding defaults: {}".format(config.sp))
     if "tractometry" not in config.sp:
         config.update_dict(config.sp, {"tractometry": {"fn": "*bundles_mean_stats.tsv"}})
 
