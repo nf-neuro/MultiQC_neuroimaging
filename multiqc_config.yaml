@@ -44,6 +44,7 @@ module_order:
   - coverage
   - streamline_count
   - tractometry
+  - bundles
   - metricsinroi
   - cortical
   - subcortical
@@ -58,6 +59,8 @@ sp:
     fn: "*streamline_count.tsv"
   tractometry:
     fn: "*bundles_mean_stats.tsv"
+  bundles:
+    fn: "*labels_uniformized.trk"
   cortical/volume:
     fn: "cortical_*_volume_*.tsv"
   subcortical/volume:
