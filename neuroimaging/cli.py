@@ -20,16 +20,6 @@ single_subject = click.option(
 
 # Set of customizable options for the atlaslabels module, that might be
 # useful for subject-level dynamic config.
-cortical_rois = click.option(
-    "--cortical-rois",
-    "cortical_rois",
-    type=click.STRING,
-    multiple=True,
-    help="Cortical ROI indexes or intervals to include in the atlaslabels module. "
-    "Can specify multiple times (e.g., '--cortical-rois 1-100 --cortical-rois 150-200') "
-    "or use comma-separated values in a single argument (e.g., '--cortical-rois 1-100,150-200'). "
-    "Ranges are inclusive (e.g., '1-100' includes ROIs 1 and 100).",
-)
 subcortical_rois = click.option(
     "--subcortical-rois",
     "subcortical_rois",
@@ -39,4 +29,10 @@ subcortical_rois = click.option(
     "Can specify multiple times (e.g., '--subcortical-rois 1-100 --subcortical-rois 150-200') "
     "or use comma-separated values in a single argument (e.g., '--subcortical-rois 1-100,150-200'). "
     "Ranges are inclusive (e.g., '1-100' includes ROIs 1 and 100).",
+)
+atlas_name = click.option(
+    "--atlas-name",
+    "atlas_name",
+    type=click.STRING,
+    help="Name of the atlas to use in the atlaslabels module. This is used for labeling and display purposes.",
 )

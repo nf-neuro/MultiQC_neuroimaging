@@ -17,6 +17,9 @@ from pathlib import Path
 
 from matplotlib import colormaps
 from matplotlib.colors import ListedColormap
+import nibabel as nib
+import numpy as np
+import pyvista as pv
 import yabplot as yab
 
 from multiqc import config
@@ -39,10 +42,12 @@ class MultiqcModule(BaseMultiqcModule):
                 "serve as key regions of interest for connectivity analyses and volumetric measurements. To "
                 "assess segmentation accuracy, verify that each label correctly corresponds to its respective "
                 "anatomical structure. Too large or too small regions might indicate issues with the segmentation. "
-                "A good first step is to investigate the volume reported in the global MultiQC report. "
-                "If discrepancies are found, consider refining registration or segmentation parameters. "
-                "It is worth noting that the 3D renderings are generated from the volumetric atlas "
-                "for QC purposes only and may not perfectly capture the cortical surface details."
+                "A good first step is to assess the alignment of the atlas with the medial wall. If the atlas "
+                "is misaligned, it may indicate issues with the atlas mapping process. "
+                "If discrepancies are found, consider investigating the segmentation logs. "
+                "It is worth noting that the 3D renderings of subcortical structures are generated from "
+                "the volumetric atlas and may not perfectly capture the surface details of these structures. "
+                "For cortical regions, missing labels will be displayed in black to facilitate identification."
             ),
         )
 
@@ -51,9 +56,12 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Fetch our input files and optional LUT
         self.config = getattr(config, "atlaslabels", {})
-        nii_files = list(self.find_log_files("atlaslabels/volume"))
-        lut_files = list(self.find_log_files("atlaslabels/metadata"))
-        if not nii_files:
+        self.sp = getattr(config, "sp", {})
+        surfaces_files = list(self.find_log_files("atlaslabels/surfaces"))
+        annot_files = list(self.find_log_files("atlaslabels/annot"))
+        nii_files = list(self.find_log_files("atlaslabels/nii"))
+        lut_files = list(self.find_log_files("atlaslabels/lut"))
+        if not surfaces_files and not nii_files and not annot_files:
             raise ModuleNoSamplesFound
 
         # Get the indexes of the cortical and subcortical ROIs from user-defined config.
@@ -62,6 +70,8 @@ class MultiqcModule(BaseMultiqcModule):
         subcortical_idx_spec = None
 
         # Check CLI arguments first (take precedence)
+        atlas_name_cli = config.kwargs.get("atlas_name")
+
         cortical_rois_cli = config.kwargs.get("cortical_rois")
         if cortical_rois_cli:
             cortical_idx_spec = list(cortical_rois_cli)
@@ -71,40 +81,22 @@ class MultiqcModule(BaseMultiqcModule):
             subcortical_idx_spec = list(subcortical_rois_cli)
 
         # Fallback to config file if CLI not provided
-        if cortical_idx_spec is None:
-            cortical_idx_spec = self.config.get("cortical_rois_indexes")
+        if atlas_name_cli is None:
+            atlas_name_cli = self.config.get("atlas_name")
 
         if subcortical_idx_spec is None:
-            subcortical_idx_spec = self.config.get("subcortical_rois_indexes")
-
-        if cortical_idx_spec is None and subcortical_idx_spec is None:
-            log.warning(
-                "Both cortical_rois_indexes and subcortical_rois_indexes must be provided in atlaslabels config or via CLI."
-            )
-            raise ModuleNoSamplesFound
+            try:
+                subcortical_idx_spec = self.config.get("subcortical_rois_indexes")
+            except subcortical_idx_spec is None:
+                raise ModuleNoSamplesFound("Subcortical ROI indexes must be specified via CLI or config file.")
 
         # Parse the index specification.
         # If only one of cortical/subcortical specs are there, we assume the remaining
         # IDs are for the other group.
-        cortical_ids = self._parse_index_spec(cortical_idx_spec)
         subcortical_ids = self._parse_index_spec(subcortical_idx_spec)
-        if not cortical_ids and not subcortical_ids:
-            log.warning("Cortical/subcortical ROI index specs are empty after parsing. Skipping Atlas Labels module.")
+        if not subcortical_ids:
+            log.warning("Subcortical ROI index specs are empty after parsing. Skipping Atlas Labels module.")
             raise ModuleNoSamplesFound
-
-        # Ensure there is no overlap in case where user defined both indexes.
-        overlap_ids = cortical_ids.intersection(subcortical_ids)
-        if overlap_ids:
-            log.warning(
-                "Atlas labels index selections overlap across cortical/subcortical groups. "
-                "Removing %d overlapping IDs from subcortical group.",
-                len(overlap_ids),
-            )
-            subcortical_ids = subcortical_ids.difference(overlap_ids)
-            # Make sure we still have some subcortical IDs left after removing the overlap.
-            if not subcortical_ids:
-                log.warning("No subcortical ROI IDs remain after overlap filtering. Skipping Atlas Labels module.")
-                raise ModuleNoSamplesFound
 
         # Use the LUT files if available
         lut_file = None
@@ -118,12 +110,36 @@ class MultiqcModule(BaseMultiqcModule):
         nii_file = nii_files[0]
         nii_path = self._resolve_found_file_path(nii_file)
 
+        # Assert that we have both lh/rh surfaces and annot files for the specified atlas name.
+        # Get the search pattern for the surface files from the config
+        sp_surf = self.sp.get("atlaslabels/surfaces", {}).get("fn", "").replace("*.", "")
+
+        # Keep only surfaces that matches lh.{sp_surf} and rh.{sp_surf}
+        for f in surfaces_files:
+            fn = f.get("fn", "")
+            if not re.search(rf"lh\.{sp_surf}$", fn) and not re.search(rf"rh\.{sp_surf}$", fn):
+                log.debug(f"Skipping surface file '{fn}' as it does not match the expected pattern.")
+            elif re.search(rf"lh\.{sp_surf}$", fn):
+                lh_surf_file = self._resolve_found_file_path(f)
+            elif re.search(rf"rh\.{sp_surf}$", fn):
+                rh_surf_file = self._resolve_found_file_path(f)
+
+        # Extract the two annot files that fit lh.{atlas_name}.annot and rh.{atlas_name}.annot
+        lh_annot_file = None
+        rh_annot_file = None
+        for f in annot_files:
+            fn = f.get("fn", "")
+            if re.search(rf"lh\.{atlas_name_cli}\.annot$", fn):
+                lh_annot_file = self._resolve_found_file_path(f)
+            elif re.search(rf"rh\.{atlas_name_cli}\.annot$", fn):
+                rh_annot_file = self._resolve_found_file_path(f)
+
         # Extract the ROIs based on the indexes and fill in the colormap from the LUT if available
-        cortical_regions = self._build_regions_from_ids(cortical_ids, all_regions, name_prefix="Cortical")
         subcortical_regions = self._build_regions_from_ids(subcortical_ids, all_regions, name_prefix="Subcortical")
+        cortical_regions = {}
 
         # Small check to make sure we have valid regions.
-        if len(cortical_regions) == 0 and len(subcortical_regions) == 0:
+        if len(subcortical_regions) == 0:
             log.warning("No valid regions remain after parsing/filtering. Skipping Atlas Labels module.")
             raise ModuleNoSamplesFound
 
@@ -135,56 +151,78 @@ class MultiqcModule(BaseMultiqcModule):
         sub_preview_path = work_dir / "subcortical_preview.png"
 
         try:
-            # Set up the cmap for the cortical regions.
-            cortical_plot_regions = {**cortical_regions}
-            cortical_labels = {rid: info["name"] for rid, info in sorted(cortical_plot_regions.items())}
-            cortical_data, cortical_cmap, cortical_vminmax = self._build_discrete_mapping(
-                cortical_plot_regions,
-                fallback_cmap_name=self.config.get("cortical_cmap", "viridis"),
+            # Load everything
+            lh_vertices, lh_faces = nib.freesurfer.read_geometry(lh_surf_file)
+            rh_vertices, rh_faces = nib.freesurfer.read_geometry(rh_surf_file)
+            lh_labels, _lh_cmap, _lh_names = nib.freesurfer.read_annot(lh_annot_file)
+            rh_labels, _rh_cmap, _rh_names = nib.freesurfer.read_annot(rh_annot_file)
+
+            # Background labels are 0, which we want to treat as NaN for visualization purposes.
+            lh_labels = np.where(lh_labels == 0, np.nan, lh_labels)
+            rh_labels = np.where(rh_labels == 0, np.nan, rh_labels)
+            # get unique labels, but drop NaN values
+            unique_labels = np.unique(np.concatenate([lh_labels, rh_labels]))
+            unique_labels = unique_labels[~np.isnan(unique_labels)]
+
+            # Build cortical regions dict from the labels
+            cortical_regions = self._build_regions_from_ids(unique_labels, all_regions, name_prefix="Cortical")
+
+            # Convert FreeSurfer mesh data to PyVista PolyData objects
+            lh_mesh = self._fs_to_pyvista(lh_vertices, lh_faces)
+            rh_mesh = self._fs_to_pyvista(rh_vertices, rh_faces)
+
+            # Small assertion to make sure the number of vertices matches the number of labels
+            if len(lh_labels) != lh_mesh.n_points:
+                log.warning(
+                    "Mismatch in number of vertices and labels for left hemisphere: %d vs %d",
+                    len(lh_labels),
+                    lh_mesh.n_points,
+                )
+                raise ModuleNoSamplesFound("Mismatch in number of vertices and labels for left hemisphere.")
+            if len(rh_labels) != rh_mesh.n_points:
+                log.warning(
+                    "Mismatch in number of vertices and labels for right hemisphere: %d vs %d",
+                    len(rh_labels),
+                    rh_mesh.n_points,
+                )
+                raise ModuleNoSamplesFound("Mismatch in number of vertices and labels for right hemisphere.")
+
+            # Add the labels as scalars to the meshes
+            lh_mesh["Data"] = lh_labels
+            rh_mesh["Data"] = rh_labels
+
+            # Build cmap
+            _cort_data, cort_cmap, _cort_vminmax = self._build_discrete_mapping(
+                cortical_regions,
+                fallback_cmap_name=self.config.get("cortical_cmap", self.config.get("cmap", "viridis")),
                 force_cmap=self.config.get("force_cortical_cmap", False),
             )
 
-            # Redirect log output from yabplot to avoid cluttering the MultiQC report logs with non-critical messages.
-            f = io.StringIO()
-            with redirect_stdout(f):
-                yab.build_subcortical_atlas(
-                    nii_path=nii_path,
-                    labels_dict=cortical_labels,
-                    out_dir=str(cortical_dir),
-                    smooth_i=self.config.get("smooth_i", 20),
-                    smooth_f=self.config.get("smooth_f", 0.7),
-                )
-            log.debug(f"yabplot cortical atlas build output:\n{f.getvalue()}")
-
-            # Generates the images, we use the subcortical function since it uses
-            # surfaces generated from a volumetric parcellation
-            f = io.StringIO()
-            with redirect_stdout(f):
-                plotter_cort = yab.plot_subcortical(
-                    data=cortical_data,
-                    custom_atlas_path=str(cortical_dir),
-                    bmesh=None,
-                    views=self.config.get(
-                        "views",
-                        ["left_lateral", "left_medial", "superior", "anterior"],
-                    ),
-                    cmap=cortical_cmap,
-                    vminmax=cortical_vminmax,
-                    style=self.config.get("style", "glossy"),
-                    display_type="matplotlib",
-                    export_path=str(cortical_preview_path),
-                )
-            log.debug(f"yabplot cortical atlas plot output:\n{f.getvalue()}")
-            if hasattr(plotter_cort, "close"):
-                plotter_cort.close()
+            # Build the cortical atlas using yabplot
+            plotter_cortical = yab.plot_vertexwise(
+                lh=lh_mesh,
+                rh=rh_mesh,
+                scalars="Data",
+                cmap=cort_cmap,
+                nan_color="lightgray",
+                views=self.config.get(
+                    "views",
+                    ["left_lateral", "left_medial", "right_medial", "right_lateral"],
+                ),
+                style=self.config.get("style", "glossy"),
+                display_type="matplotlib",
+                export_path=str(cortical_preview_path),
+            )
+            if hasattr(plotter_cortical, "close"):
+                plotter_cortical.close()
 
             # Embed the image as base64 in the report
             if cortical_preview_path.exists():
-                img_b64 = base64.b64encode(cortical_preview_path.read_bytes()).decode("ascii")
+                cortical_img_b64 = base64.b64encode(cortical_preview_path.read_bytes()).decode("ascii")
                 cortical_content = (
                     '<img alt="Cortical atlas mesh preview" '
                     'style="max-width:100%;height:auto;" '
-                    f'src="data:image/png;base64,{img_b64}" />'
+                    f'src="data:image/png;base64,{cortical_img_b64}" />'
                 )
         except Exception as e:
             log.warning(f"Cortical atlas build/render failed: {e}")
@@ -272,6 +310,19 @@ class MultiqcModule(BaseMultiqcModule):
             },
             "multiqc_atlaslabels",
         )
+
+    @staticmethod
+    def _fs_to_pyvista(vertices: np.ndarray, faces: np.ndarray) -> pv.PolyData:
+        """
+        Convert FreeSurfer mesh data to a PyVista PolyData object.
+        """
+        vtk_faces = np.hstack(
+            [
+                np.full((faces.shape[0], 1), 3, dtype=np.int32),
+                faces.astype(np.int32),
+            ]
+        )
+        return pv.PolyData(vertices, vtk_faces)
 
     @staticmethod
     def _resolve_found_file_path(found_file: dict) -> str:
