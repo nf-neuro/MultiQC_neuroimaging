@@ -22,6 +22,7 @@ import re
 from typing import Dict
 
 import numpy as np
+import pandas as pd
 
 from multiqc import config
 from multiqc.base_module import BaseMultiqcModule, ModuleNoSamplesFound
@@ -96,11 +97,17 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Find LUT files.
         for f in self.find_log_files("connectivity/lut"):
-            # Just need to load a single JSON file to get the LUT,
-            # so we can break after the first one.
-            with open(f["root"] + "/" + f["fn"], "r") as fp:
-                lut = json.load(fp)
-            break
+            # Look if the file is a JSON file or a TSV file
+            if f["fn"].lower().endswith(".json"):
+                with open(f["root"] + "/" + f["fn"], "r") as fp:
+                    lut = json.load(fp)
+            elif f["fn"].lower().endswith(".tsv"):
+                lut_df = pd.read_csv(f["root"] + "/" + f["fn"], sep="\t")
+                # by BIDS convention, first column is index and second column is label
+                lut = dict(zip(lut_df.iloc[:, 0].astype(str), lut_df.iloc[:, 1].astype(str)))
+            else:
+                log.debug(f"Unsupported LUT file format for '{f['fn']}'. Expected .json or .tsv. Skipping file.")
+                raise ModuleNoSamplesFound(f"Unsupported LUT file format for '{f['fn']}'. Expected .json or .tsv.")
 
         # Superfluous function call to confirm that it is used in this module
         # Replace None with actual version if it is available
