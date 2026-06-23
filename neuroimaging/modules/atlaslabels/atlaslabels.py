@@ -47,7 +47,6 @@ class MultiqcModule(BaseMultiqcModule):
                 "If discrepancies are found, consider investigating the segmentation logs. "
                 "It is worth noting that the 3D renderings of subcortical structures are generated from "
                 "the volumetric atlas and may not perfectly capture the surface details of these structures. "
-                "For cortical regions, missing labels will be displayed in black to facilitate identification."
             ),
         )
 
@@ -204,7 +203,7 @@ class MultiqcModule(BaseMultiqcModule):
                 rh=rh_mesh,
                 scalars="Data",
                 cmap=cort_cmap,
-                nan_color="lightgray",
+                nan_color=(0.99, 0.99, 0.99, 1),  # Very light gray for NaN (background) regions
                 views=self.config.get(
                     "views",
                     ["left_lateral", "left_medial", "right_medial", "right_lateral"],
