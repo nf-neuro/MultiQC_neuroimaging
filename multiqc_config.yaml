@@ -45,8 +45,8 @@ tractometry:
 
 # Atlas labels module configuration
 atlaslabels:
+  atlas_name: "aparc"
   style: "glossy"
-  cortical_rois_indexes: ["1:188", "225:227"] # Example for brainnetome preadolescent atlas.
   subcortical_rois_indexes: ["189:224"] # Example for brainnetome preadolescent atlas.
   cortical_cmap: "viridis"
   subcortical_cmap: "magma"
@@ -97,10 +97,15 @@ sp:
     fn: "cortical_*_volume_*.tsv"
   subcortical/volume:
     fn: "subcortical_*_volume_*.tsv"
-  atlaslabels/volume:
-    fn: "*seg-*_dseg.nii.gz"
-  atlaslabels/metadata:
-    fn: "*seg-*_dseg.txt"
+  atlaslabels/surfaces:
+    fn: "*.white"
+  atlaslabels/annot:
+    fn: "*.annot"
+  atlaslabels/lut:
+    fn: "*dseg.tsv"
+    shared: true
+  atlaslabels/nii:
+    fn: "*dseg.nii.gz"
   metricsinroi:
     fn: "*mean_desc-roi_stats.tsv"
     shared: true
@@ -122,4 +127,5 @@ sp:
   connectivity/matrices:
     fn: "*stat-*.npy"
   connectivity/lut:
-    fn: "*LUT.json"
+    fn: "*dseg.tsv"
+    shared: true

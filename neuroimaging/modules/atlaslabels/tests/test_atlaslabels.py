@@ -138,14 +138,13 @@ def test_resolve_found_file_path_handles_relative_and_absolute_paths(tmp_path):
 def test_adds_fallback_content_when_atlas_generation_fails(monkeypatch, tmp_path):
     config.kwargs["single_subject"] = True
     config.atlaslabels = {
-        "cortical_rois_indexes": [1, 2],
         "subcortical_rois_indexes": [3, 4],
     }
 
     def fake_find_log_files(self, pattern):
-        if pattern == "atlaslabels/volume":
+        if pattern == "atlaslabels/nii":
             return [{"fn": "atlas.nii.gz", "root": str(tmp_path)}]
-        if pattern == "atlaslabels/metadata":
+        if pattern == "atlaslabels/lut":
             return []
         return []
 
