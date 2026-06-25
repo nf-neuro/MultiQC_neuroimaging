@@ -156,15 +156,14 @@ class MultiqcModule(BaseMultiqcModule):
             lh_labels, _lh_cmap, _lh_names = nib.freesurfer.read_annot(lh_annot_file)
             rh_labels, _rh_cmap, _rh_names = nib.freesurfer.read_annot(rh_annot_file)
 
-            # Background labels are 0, which we want to treat as NaN for visualization purposes.
-            lh_labels = np.where(lh_labels == 0, np.nan, lh_labels)
-            rh_labels = np.where(rh_labels == 0, np.nan, rh_labels)
             # get unique labels, but drop NaN values
             unique_labels = np.unique(np.concatenate([lh_labels, rh_labels]))
             unique_labels = unique_labels[~np.isnan(unique_labels)]
 
             # Build cortical regions dict from the labels
             cortical_regions = self._build_regions_from_ids(unique_labels, all_regions, name_prefix="Cortical")
+            # Drop the background (id 0) if present
+            cortical_regions.pop(0, None)
 
             # Convert FreeSurfer mesh data to PyVista PolyData objects
             lh_mesh = self._fs_to_pyvista(lh_vertices, lh_faces)
@@ -187,22 +186,24 @@ class MultiqcModule(BaseMultiqcModule):
                 raise ModuleNoSamplesFound("Mismatch in number of vertices and labels for right hemisphere.")
 
             # Add the labels as scalars to the meshes
-            lh_mesh["Data"] = lh_labels
-            rh_mesh["Data"] = rh_labels
+            lh_mesh["Data"] = lh_labels.astype(int)
+            rh_mesh["Data"] = rh_labels.astype(int)
 
             # Build cmap
-            _cort_data, cort_cmap, _cort_vminmax = self._build_discrete_mapping(
+            _cort_data, _cort_cmap, cort_vminmax, cort_colors = self._build_discrete_mapping(
                 cortical_regions,
                 fallback_cmap_name=self.config.get("cortical_cmap", self.config.get("cmap", "viridis")),
                 force_cmap=self.config.get("force_cortical_cmap", False),
             )
+            cort_colors.insert(0, (0.99, 0.99, 0.99))  # Very light gray for NaN (background) regions
 
             # Build the cortical atlas using yabplot
             plotter_cortical = yab.plot_vertexwise(
                 lh=lh_mesh,
                 rh=rh_mesh,
                 scalars="Data",
-                cmap=cort_cmap,
+                lut=cort_colors,
+                vminmax=cort_vminmax,
                 nan_color=(0.99, 0.99, 0.99, 1),  # Very light gray for NaN (background) regions
                 views=self.config.get(
                     "views",
@@ -357,7 +358,7 @@ class MultiqcModule(BaseMultiqcModule):
 
         cmap = ListedColormap(colors)
         vminmax = [1, len(colors)]
-        return values, cmap, vminmax
+        return values, cmap, vminmax, colors
 
     @staticmethod
     def _parse_index_spec(index_spec) -> set[int]:
