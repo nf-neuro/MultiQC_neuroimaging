@@ -79,9 +79,10 @@ def test_build_discrete_mapping_prefers_lut_colors_when_complete():
         1: {"name": "A", "r": 255, "g": 0, "b": 0},
         2: {"name": "B", "r": 0, "g": 255, "b": 0},
     }
-    values, cmap, vminmax = MultiqcModule._build_discrete_mapping(regions, fallback_cmap_name="plasma")
+    values, cmap, vminmax, colors = MultiqcModule._build_discrete_mapping(regions, fallback_cmap_name="plasma")
     assert values == {"A": 1.0, "B": 2.0}
     assert vminmax == [1, 2]
+    assert colors == [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0)]
     assert hasattr(cmap, "colors")
 
 

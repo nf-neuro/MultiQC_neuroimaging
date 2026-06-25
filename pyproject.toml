@@ -36,7 +36,7 @@ dependencies = [
     "multiqc",
     "pandas",
     "plotly",
-    "yabplot>=0.5.1"
+    "yabplot @ git+https://github.com/gagnonanthony/yabplot.git@90552b2954c3785c34b6aee41ef2b01f00953268"
 ]
 
 [tool.setuptools]
