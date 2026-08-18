@@ -190,7 +190,7 @@ class MultiqcModule(BaseMultiqcModule):
             rh_mesh["Data"] = rh_labels.astype(int)
 
             # Build cmap
-            _cort_data, _cort_cmap, cort_vminmax, cort_colors = self._build_discrete_mapping(
+            _cort_data, cort_cmap, cort_vminmax, cort_colors = self._build_discrete_mapping(
                 cortical_regions,
                 fallback_cmap_name=self.config.get("cortical_cmap", self.config.get("cmap", "viridis")),
                 force_cmap=self.config.get("force_cortical_cmap", False),
@@ -202,7 +202,7 @@ class MultiqcModule(BaseMultiqcModule):
                 lh=lh_mesh,
                 rh=rh_mesh,
                 scalars="Data",
-                lut=cort_colors,
+                lut=cort_colors if cort_colors else cort_cmap,
                 vminmax=cort_vminmax,
                 nan_color=(0.99, 0.99, 0.99, 1),  # Very light gray for NaN (background) regions
                 views=self.config.get(
@@ -354,7 +354,7 @@ class MultiqcModule(BaseMultiqcModule):
         if not colors:
             cmap = colormaps.get_cmap(fallback_cmap_name)
             vminmax = [1, max(1, len(values))]
-            return values, cmap, vminmax
+            return values, cmap, vminmax, False  # TODO: FIX THIS TO RETURN 4 ITEMS AS WELL
 
         cmap = ListedColormap(colors)
         vminmax = [1, len(colors)]
