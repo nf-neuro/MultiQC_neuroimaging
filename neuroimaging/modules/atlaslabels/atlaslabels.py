@@ -245,7 +245,7 @@ class MultiqcModule(BaseMultiqcModule):
             # Similar to the cortical region, build the colormap either based on the LUT
             # or the default colormap.
             sub_plot_regions = dict(subcortical_regions)
-            sub_data, sub_cmap, sub_vminmax = self._build_discrete_mapping(
+            sub_data, sub_cmap, sub_vminmax, sub_colors = self._build_discrete_mapping(
                 sub_plot_regions,
                 fallback_cmap_name=self.config.get("subcortical_cmap", self.config.get("cmap", "viridis")),
                 force_cmap=self.config.get("force_subcortical_cmap", False),
@@ -261,7 +261,7 @@ class MultiqcModule(BaseMultiqcModule):
                         "views",
                         ["left_lateral", "left_medial", "superior", "anterior"],
                     ),
-                    cmap=sub_cmap,
+                    cmap=sub_colors if sub_colors else sub_cmap,
                     vminmax=sub_vminmax,
                     style=self.config.get("style", "glossy"),
                     display_type="matplotlib",
@@ -354,7 +354,7 @@ class MultiqcModule(BaseMultiqcModule):
         if not colors:
             cmap = colormaps.get_cmap(fallback_cmap_name)
             vminmax = [1, max(1, len(values))]
-            return values, cmap, vminmax, False  # TODO: FIX THIS TO RETURN 4 ITEMS AS WELL
+            return values, cmap, vminmax, False
 
         cmap = ListedColormap(colors)
         vminmax = [1, len(colors)]
